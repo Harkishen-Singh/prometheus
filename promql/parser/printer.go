@@ -45,6 +45,11 @@ func tree(node Node, level string) string {
 	return t
 }
 
+func (node *CommentExpr) String() string {
+	fmt.Println("being callled +++++++++++++++")
+	return node.Comment
+}
+
 func (node *EvalStmt) String() string {
 	return "EVAL " + node.Expr.String()
 }

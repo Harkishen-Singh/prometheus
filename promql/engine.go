@@ -1216,6 +1216,9 @@ func (ev *evaluator) eval(expr parser.Expr) parser.Value {
 
 		return mat
 
+	case *parser.CommentExpr:
+		return nil
+
 	case *parser.ParenExpr:
 		return ev.eval(e.Expr)
 

@@ -16,6 +16,7 @@ package parser
 
 import (
         "math"
+        "fmt"
         "sort"
         "strconv"
         "time"
@@ -137,7 +138,7 @@ START_METRIC_SELECTOR
 %type <series> series_item series_values
 %type <uint> uint
 %type <float> number series_value signed_number
-%type <node> aggregate_expr aggregate_modifier bin_modifier binary_expr bool_modifier expr function_call function_call_args function_call_body group_modifiers label_matchers matrix_selector number_literal offset_expr on_or_ignoring paren_expr string_literal subquery_expr unary_expr vector_selector
+%type <node> aggregate_expr aggregate_modifier bin_modifier binary_expr bool_modifier expr cmnt function_call function_call_args function_call_body group_modifiers label_matchers matrix_selector number_literal offset_expr on_or_ignoring paren_expr string_literal subquery_expr unary_expr vector_selector
 %type <duration> duration maybe_duration
 
 %start start
@@ -160,19 +161,61 @@ START_METRIC_SELECTOR
 %%
 
 start           :
-                START_METRIC metric
-                        { yylex.(*parser).generatedParserResult = $2 }
+                 START_METRIC metric
+                        { 
+
+                        fmt.Println("going through")
+                                yylex.(*parser).generatedParserResult = $2 
+                        }
                 | START_SERIES_DESCRIPTION series_description
+                | START_EXPRESSION COMMENT
+                        { 
+                                fmt.Println("inside the ONLY")
+                                fmt.Println("positiononle is ")
+                                fmt.Println($2.PositionRange())
+                                fmt.Println($2.Val)
+                                ce := &CommentExpr{
+                                        Comment: $2.Val,
+                                        PosRange: $2.PositionRange(),
+                                }
+                                yylex.(*parser).comments = append(yylex.(*parser).comments, ce)
+
+                                yylex.(*parser).generatedParserResult = ce
+                                }
                 | START_EXPRESSION /* empty */ EOF
                         { yylex.(*parser).addParseErrf(PositionRange{}, "no expression found in input")}
+                
+                // | START_EXPRESSION expr cmnt
+                //         { 
+                //         fmt.Println("going through commnet one----")
+                //         yylex.(*parser).generatedParserResult = $3
+                //         // // yylex.(*parser).comments = &CommentExpr{
+                //         // //         Comment: $3,
+                //         // // }
+                //         }
                 | START_EXPRESSION expr
-                        { yylex.(*parser).generatedParserResult = $2 }
+                        { 
+                        fmt.Println("normal expr")
+                        yylex.(*parser).generatedParserResult = $2 }
                 | START_METRIC_SELECTOR vector_selector
                         { yylex.(*parser).generatedParserResult = $2 }
                 | start EOF
                 | error /* If none of the more detailed error messages are triggered, we fall back to this. */
                         { yylex.(*parser).unexpected("","") }
                 ;
+
+cmnt: COMMENT
+        {
+                fmt.Println("into the cmnt")
+                fmt.Println("comment is ", $1.Val)
+                // yylex.(*parser).generatedParserResult = $1
+                ce := &CommentExpr{
+                                Comment: $1.Val,
+                                PosRange: $1.PositionRange(),
+                        }
+                yylex.(*parser).comments = append(yylex.(*parser).comments, ce)
+                $$ = ce
+        }
 
 expr            :
                 aggregate_expr
@@ -453,6 +496,7 @@ unary_expr      :
 
 vector_selector: metric_identifier label_matchers
                         {
+                        fmt.Println("vector selector 1")
                         vs := $2.(*VectorSelector)
                         vs.PosRange = mergeRanges(&$1, vs)
                         vs.Name = $1.Val
@@ -461,6 +505,18 @@ vector_selector: metric_identifier label_matchers
                         }
                 | metric_identifier
                         {
+                        fmt.Println("vector selector 2")
+                        vs := &VectorSelector{
+                                Name: $1.Val,
+                                LabelMatchers: []*labels.Matcher{},
+                                PosRange: $1.PositionRange(),
+                        }
+                        yylex.(*parser).assembleVectorSelector(vs)
+                        $$ = vs
+                        }
+                | metric_identifier cmnt
+                        {
+                        fmt.Println("vector selector 3")
                         vs := &VectorSelector{
                                 Name: $1.Val,
                                 LabelMatchers: []*labels.Matcher{},

@@ -16,6 +16,7 @@ package parser
 import (
 	"fmt"
 	"os"
+	// "reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -48,6 +49,7 @@ type parser struct {
 	yyParser yyParserImpl
 
 	generatedParserResult interface{}
+	comments []interface{}
 	parseErrors           ParseErrors
 }
 
@@ -108,6 +110,10 @@ func ParseExpr(input string) (expr Expr, err error) {
 	defer p.recover(&err)
 
 	parseResult := p.parseGenerated(START_EXPRESSION)
+	fmt.Println("result is ")
+	fmt.Println(parseResult)
+	fmt.Println("comments below")
+	fmt.Println(p.comments)
 
 	if parseResult != nil {
 		expr = parseResult.(Expr)
@@ -121,6 +127,8 @@ func ParseExpr(input string) (expr Expr, err error) {
 	if len(p.parseErrors) != 0 {
 		err = p.parseErrors
 	}
+
+	fmt.Println("expr is ", expr)
 
 	return expr, err
 }
@@ -300,9 +308,9 @@ func (p *parser) Lex(lval *yySymType) int {
 	for {
 		p.lex.NextItem(&lval.item)
 		typ = lval.item.Typ
-		if typ != COMMENT {
-			break
-		}
+		// if typ != COMMENT {
+		break
+		// }
 	}
 
 	switch typ {
@@ -563,6 +571,9 @@ func (p *parser) checkAST(node Node) (typ ValueType) {
 			p.expectType(arg, n.Func.ArgTypes[i], fmt.Sprintf("call to function %q", n.Func.Name))
 		}
 
+	case *CommentExpr:
+		return ""
+
 	case *ParenExpr:
 		p.checkAST(n.Expr)
 
@@ -611,7 +622,7 @@ func (p *parser) checkAST(node Node) (typ ValueType) {
 		// Nothing to do for terminals.
 
 	default:
-		p.addParseErrf(n.PositionRange(), "unknown node type: %T", node)
+		p.addParseErrf(n.PositionRange(), "----unknown node type: %T", node)
 	}
 	return
 }

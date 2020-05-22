@@ -16,6 +16,7 @@ package parser
 import (
 	"math"
 	"strings"
+	"fmt"
 	"testing"
 	"time"
 
@@ -2588,6 +2589,9 @@ func TestParseExpressions(t *testing.T) {
 
 		if !test.fail {
 			testutil.Ok(t, err)
+			fmt.Println("--------------")
+			fmt.Println(test.expected)
+			fmt.Println(expr.Type())
 			testutil.Equals(t, test.expected, expr, "error on input '%s'", test.input)
 		} else {
 			testutil.NotOk(t, err)

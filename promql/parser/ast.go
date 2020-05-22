@@ -105,6 +105,12 @@ type BinaryExpr struct {
 	ReturnBool bool
 }
 
+type CommentExpr struct {
+	Node
+	Comment string
+	PosRange PositionRange
+}
+
 // Call represents a function call.
 type Call struct {
 	Func *Function   // The function that was called.
@@ -190,6 +196,7 @@ func (TestStmt) PositionRange() PositionRange {
 }
 func (e *AggregateExpr) Type() ValueType  { return ValueTypeVector }
 func (e *Call) Type() ValueType           { return e.Func.ReturnType }
+func (e *CommentExpr) Type() ValueType	  { return ValueTypeScalar }
 func (e *MatrixSelector) Type() ValueType { return ValueTypeMatrix }
 func (e *SubqueryExpr) Type() ValueType   { return ValueTypeMatrix }
 func (e *NumberLiteral) Type() ValueType  { return ValueTypeScalar }
@@ -207,6 +214,7 @@ func (e *BinaryExpr) Type() ValueType {
 func (*AggregateExpr) expr()  {}
 func (*BinaryExpr) expr()     {}
 func (*Call) expr()           {}
+func (*CommentExpr) expr() 	  {}
 func (*MatrixSelector) expr() {}
 func (*SubqueryExpr) expr()   {}
 func (*NumberLiteral) expr()  {}
@@ -347,7 +355,7 @@ func Children(node Node) []Node {
 		return []Node{n.Expr}
 	case *MatrixSelector:
 		return []Node{n.VectorSelector}
-	case *NumberLiteral, *StringLiteral, *VectorSelector:
+	case *CommentExpr, *NumberLiteral, *StringLiteral, *VectorSelector:
 		// nothing to do
 		return []Node{}
 	default:
@@ -387,6 +395,9 @@ func (e *BinaryExpr) PositionRange() PositionRange {
 	return mergeRanges(e.LHS, e.RHS)
 }
 func (e *Call) PositionRange() PositionRange {
+	return e.PosRange
+}
+func (e *CommentExpr) PositionRange() PositionRange {
 	return e.PosRange
 }
 func (e *EvalStmt) PositionRange() PositionRange {

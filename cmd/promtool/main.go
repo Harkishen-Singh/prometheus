@@ -64,6 +64,10 @@ func main() {
 
 	checkMetricsCmd := checkCmd.Command("metrics", checkMetricsUsage)
 
+	prettifyCmd := app.Command("prettify", "Prettify PromQL expressions and YAML syntax.")
+	prettifyRuleFiles := prettifyCmd.Command("rules", "Format and prettify rule files.")
+	prettifyPromqlExpression := prettifyCmd.Command("expression", "Prettify a Promql Expression.") // TODO (harkishen).
+
 	queryCmd := app.Command("query", "Run query against a Prometheus server.")
 	queryCmdFmt := queryCmd.Flag("format", "Output format of the query.").Short('o').Default("promql").Enum("promql", "json")
 	queryInstantCmd := queryCmd.Command("instant", "Run instant query.")
@@ -104,6 +108,8 @@ func main() {
 	).Required().ExistingFiles()
 
 	parsedCmd := kingpin.MustParse(app.Parse(os.Args[1:]))
+	fmt.Println("parsed cmd is ", parsedCmd)
+	fmt.Println(prettifyRuleFiles.FullCommand())
 
 	var p printer
 	switch *queryCmdFmt {
@@ -122,6 +128,12 @@ func main() {
 
 	case checkMetricsCmd.FullCommand():
 		os.Exit(CheckMetrics())
+
+	case prettifyRuleFiles.FullCommand():
+		os.Exit(0)
+		
+	case prettifyPromqlExpression.FullCommand():
+		os.Exit(0)
 
 	case queryInstantCmd.FullCommand():
 		os.Exit(QueryInstant(*queryServer, *queryExpr, p))
