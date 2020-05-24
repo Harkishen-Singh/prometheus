@@ -5,8 +5,8 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
-	"github.com/prometheus/prometheus/promql/parser"
 	"github.com/prometheus/prometheus/pkg/rulefmt"
+	"github.com/prometheus/prometheus/promql/parser"
 )
 
 const (
@@ -20,15 +20,15 @@ const (
 // Prettier handles the prettifying and formatting operation over a
 // list of rules files or a single expression.
 type Prettier struct {
-	files []string
+	files      []string
 	expression string
 }
 
 // New returns a new prettier over the given slice of files.
 func New(Type uint, content interface{}) (*Prettier, error) {
 	var (
-		ok bool
-		files []string
+		ok         bool
+		files      []string
 		expression string
 	)
 	switch Type {
@@ -41,7 +41,7 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 		return nil, errors.Errorf("invalid type: %T", reflect.TypeOf(content))
 	}
 	return &Prettier{
-		files: files,
+		files:      files,
 		expression: expression,
 	}, nil
 }
