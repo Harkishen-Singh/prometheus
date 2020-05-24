@@ -182,6 +182,8 @@ start           :
                         }
                 | START_EXPRESSION /* empty */ EOF
                         { yylex.(*parser).addParseErrf(PositionRange{}, "no expression found in input")}
+                | START_EXPRESSION COMMENT /* empty */ EOF
+                        { yylex.(*parser).addParseErrf(PositionRange{}, "no expression found in input")}
                 | START_EXPRESSION expr
                         { yylex.(*parser).generatedParserResult = $2 }
                 | START_METRIC_SELECTOR vector_selector

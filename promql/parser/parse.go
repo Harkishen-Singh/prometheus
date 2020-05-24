@@ -436,6 +436,8 @@ func (p *parser) expectType(node Node, want ValueType, context string) {
 func (p *parser) checkAST(node Node) (typ ValueType) {
 	// For expressions the type is determined by their Type function.
 	// Lists do not have a type but are not invalid either.
+	fmt.Println("node is ")
+	fmt.Println(node)
 	switch n := node.(type) {
 	case Expressions:
 		typ = ValueTypeNone
