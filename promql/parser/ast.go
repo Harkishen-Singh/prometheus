@@ -106,8 +106,8 @@ type BinaryExpr struct {
 }
 
 type CommentExpr struct {
-	Expr Expr
-	Comment string
+	Expr     Expr
+	Comment  string
 	PosRange PositionRange
 }
 
@@ -196,7 +196,7 @@ func (TestStmt) PositionRange() PositionRange {
 }
 func (e *AggregateExpr) Type() ValueType  { return ValueTypeVector }
 func (e *Call) Type() ValueType           { return e.Func.ReturnType }
-func (e *CommentExpr) Type() ValueType	  { return ValueTypeVector }
+func (e *CommentExpr) Type() ValueType    { return ValueTypeVector }
 func (e *MatrixSelector) Type() ValueType { return ValueTypeMatrix }
 func (e *SubqueryExpr) Type() ValueType   { return ValueTypeMatrix }
 func (e *NumberLiteral) Type() ValueType  { return ValueTypeScalar }
@@ -214,7 +214,7 @@ func (e *BinaryExpr) Type() ValueType {
 func (*AggregateExpr) expr()  {}
 func (*BinaryExpr) expr()     {}
 func (*Call) expr()           {}
-func (*CommentExpr) expr() 	  {}
+func (*CommentExpr) expr()    {}
 func (*MatrixSelector) expr() {}
 func (*SubqueryExpr) expr()   {}
 func (*NumberLiteral) expr()  {}

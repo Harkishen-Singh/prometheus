@@ -375,8 +375,6 @@ func (ng *Engine) NewInstantQuery(q storage.Queryable, qs string, ts time.Time) 
 // NewRangeQuery returns an evaluation query for the given time range and with
 // the resolution set by the interval.
 func (ng *Engine) NewRangeQuery(q storage.Queryable, qs string, start, end time.Time, interval time.Duration) (Query, error) {
-	fmt.Println("qs is below")
-	fmt.Println(qs)
 	expr, err := parser.ParseExpr(qs)
 	if err != nil {
 		return nil, err
@@ -529,7 +527,6 @@ func (ng *Engine) execEvalStmt(ctx context.Context, query *query, s *parser.Eval
 	evalSpanTimer, ctxInnerEval := query.stats.GetSpanTimer(ctx, stats.InnerEvalTime, ng.metrics.queryInnerEval)
 	// Instant evaluation. This is executed as a range evaluation with one step.
 	if s.Start == s.End && s.Interval == 0 {
-		fmt.Println("instant evaluation")
 		start := timeMilliseconds(s.Start)
 		evaluator := &evaluator{
 			startTimestamp:      start,
@@ -546,7 +543,6 @@ func (ng *Engine) execEvalStmt(ctx context.Context, query *query, s *parser.Eval
 		if err != nil {
 			return nil, warnings, err
 		}
-		fmt.Println("evaluation complete")
 
 		evalSpanTimer.Finish()
 
@@ -580,7 +576,6 @@ func (ng *Engine) execEvalStmt(ctx context.Context, query *query, s *parser.Eval
 			panic(errors.Errorf("promql.Engine.exec: unexpected expression type %q", s.Expr.Type()))
 		}
 	}
-	fmt.Println("range evaluation")
 
 	// Range evaluation.
 	evaluator := &evaluator{
@@ -708,7 +703,6 @@ func (ng *Engine) populateSeries(ctx context.Context, querier storage.Querier, s
 				return err
 			}
 			n.UnexpandedSeriesSet = set
-			fmt.Println("unexpaneded series set is => ", n.UnexpandedSeriesSet)
 
 		case *parser.MatrixSelector:
 			evalRange = n.Range
@@ -752,27 +746,16 @@ func extractGroupsFromPath(p []parser.Node) (bool, []string) {
 func checkForSeriesSetExpansion(ctx context.Context, expr parser.Expr) {
 	switch e := expr.(type) {
 	case *parser.MatrixSelector:
-		fmt.Println("just before")
 		checkForSeriesSetExpansion(ctx, e.VectorSelector)
 	case *parser.VectorSelector:
-		fmt.Println("seriesSetExpansion vectorSelector")
-		fmt.Println("e is")
-		fmt.Println(e)
-		fmt.Println(e.Series)
-		fmt.Println("series where above")
 		if e.Series == nil {
-			fmt.Println("inside this\n\n")
-			fmt.Println(e.UnexpandedSeriesSet)
-			fmt.Println("unexpanded above")
 			series, err := expandSeriesSet(ctx, e.UnexpandedSeriesSet)
 			if err != nil {
-				fmt.Println("and now inside the err since its not nil")
 				panic(err)
 			} else {
 				e.Series = series
 			}
 		}
-		fmt.Println("over here then")
 	}
 }
 
@@ -817,14 +800,10 @@ func (ev *evaluator) error(err error) {
 
 // recover is the handler that turns panics into returns from the top level of evaluation.
 func (ev *evaluator) recover(errp *error) {
-	fmt.Println("errp")
-	fmt.Println(*errp)
 	e := recover()
 	if e == nil {
 		return
 	}
-	fmt.Println("recover: e is ")
-	fmt.Println(e)
 	if err, ok := e.(runtime.Error); ok {
 		// Print the stack trace but do not inhibit the running application.
 		buf := make([]byte, 64<<10)
@@ -1045,7 +1024,6 @@ func (ev *evaluator) evalSubquery(subq *parser.SubqueryExpr) *parser.MatrixSelec
 
 // eval evaluates the given expression as the given AST expression node requires.
 func (ev *evaluator) eval(expr parser.Expr) parser.Value {
-	fmt.Println("into eval")
 	// This is the top-level evaluation method.
 	// Thus, we check for timeout/cancellation here.
 	if err := contextDone(ev.ctx, "expression evaluation"); err != nil {
@@ -1070,7 +1048,6 @@ func (ev *evaluator) eval(expr parser.Expr) parser.Value {
 		}, e.Param, e.Expr)
 
 	case *parser.Call:
-		fmt.Println("in the *parser.Call")
 		call := FunctionCalls[e.Func.Name]
 
 		if e.Func.Name == "timestamp" {
@@ -1240,10 +1217,6 @@ func (ev *evaluator) eval(expr parser.Expr) parser.Value {
 		return mat
 
 	case *parser.CommentExpr:
-		fmt.Println("after here")
-		var rr error
-		ev.recover(&rr)
-		fmt.Println("trace: ", rr)
 		return ev.eval(e.Expr)
 
 	case *parser.ParenExpr:
@@ -1308,14 +1281,7 @@ func (ev *evaluator) eval(expr parser.Expr) parser.Value {
 		})
 
 	case *parser.VectorSelector:
-		fmt.Println("in the vector selector")
-
-		var rr error
-		ev.recover(&rr)
-		fmt.Println("trace: ", rr)
-		fmt.Println("e => ", e)
 		checkForSeriesSetExpansion(ev.ctx, e)
-		fmt.Println("comes out")
 		mat := make(Matrix, 0, len(e.Series))
 		it := storage.NewBuffer(durationMilliseconds(ev.lookbackDelta))
 		for i, s := range e.Series {

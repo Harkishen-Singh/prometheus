@@ -131,7 +131,7 @@ func main() {
 
 	case prettifyRuleFiles.FullCommand():
 		os.Exit(0)
-		
+
 	case prettifyPromqlExpression.FullCommand():
 		os.Exit(0)
 

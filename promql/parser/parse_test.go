@@ -14,9 +14,9 @@
 package parser
 
 import (
+	"fmt"
 	"math"
 	"strings"
-	"fmt"
 	"testing"
 	"time"
 

@@ -111,25 +111,6 @@ func ParseExpr(input string) (expr Expr, err error) {
 	defer p.recover(&err)
 
 	parseResult := p.parseGenerated(START_EXPRESSION)
-	fmt.Println("result is ")
-	fmt.Println(parseResult)
-	fmt.Println("comments below")
-	fmt.Println(p.comments)
-	// var cc interface{}
-	// cc := &CommentExpr{
-	// 	Comment: "# comment",
-	// 	Expr: &VectorSelector{
-	// 		Name: "go_goroutines",
-	// 	},
-	// }
-	// fmt.Println("ppppp")
-	// cc := parseResult.(Expr)
-	// fmt.Println(cc)
-	// switch node := cc.(type) {
-	// case *CommentExpr:
-	// 	fmt.Println("ppppp")
-	// 	fmt.Println(node.Expr)
-	// }
 
 	if parseResult != nil {
 		expr = parseResult.(Expr)
@@ -143,12 +124,6 @@ func ParseExpr(input string) (expr Expr, err error) {
 	if len(p.parseErrors) != 0 {
 		err = p.parseErrors
 	}
-
-	fmt.Println("expr is ", expr)
-	// vs, ok := expr.(*VectorSelector)
-	// fmt.Println(ok)
-	// fmt.Println("series is ", vs.Series)
-	// fmt.Println("unepanded is ", vs.UnexpandedSeriesSet)
 
 	return expr, err
 }
@@ -592,7 +567,6 @@ func (p *parser) checkAST(node Node) (typ ValueType) {
 		}
 
 	case *CommentExpr:
-		fmt.Println("ast CommentExpr")
 		p.checkAST(n.Expr)
 
 	case *ParenExpr:

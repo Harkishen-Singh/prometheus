@@ -16,7 +16,6 @@ package parser
 
 import (
         "math"
-        "fmt"
         "sort"
         "strconv"
         "time"
@@ -162,56 +161,29 @@ START_METRIC_SELECTOR
 
 start           :
                  START_METRIC metric
-                        { 
-
-                        fmt.Println("going through")
-                                yylex.(*parser).generatedParserResult = $2 
-                        }
+                        { yylex.(*parser).generatedParserResult = $2 }
                 | START_SERIES_DESCRIPTION series_description
                 | START_EXPRESSION COMMENT
-                        { 
-                                fmt.Println("inside the ONLY")
-                                fmt.Println("positiononle is ")
-                                fmt.Println($2.PositionRange())
-                                fmt.Println($2.Val)
+                        {
                                 ce := &CommentExpr{
                                         Comment: $2.Val,
                                         PosRange: $2.PositionRange(),
                                 }
-                                // yylex.(*parser).comments = append(yylex.(*parser).comments, ce)
-
                                 yylex.(*parser).generatedParserResult = ce
-                                }
+                        }
                 | START_EXPRESSION COMMENT expr 
                         {
-                                fmt.Println("third case ")
-                                fmt.Println("comment -> ", $2)
-                                fmt.Println("expr -> ", $3)
                                 ce := &CommentExpr{
                                         Comment: $2.Val,
                                         Expr: $3.(Expr),
                                         PosRange: $3.PositionRange(),
                                 }
                                 yylex.(*parser).generatedParserResult = ce
-
                         }
                 | START_EXPRESSION /* empty */ EOF
                         { yylex.(*parser).addParseErrf(PositionRange{}, "no expression found in input")}
-                
-                // | START_EXPRESSION expr cmnt
-                //         { 
-                //         fmt.Println("going through commnet expr cmnt")
-                //         // // yylex.(*parser).generatedParserResult = $3
-                //         ce := &CommentExpr{
-                //                 Comment: $3,
-                //                 Expr: $2,
-                //         }
-                //         yylex.(*parser).generatedParserResult = ce
-                //         }
                 | START_EXPRESSION expr
-                        { 
-                        fmt.Println("normal expr")
-                        yylex.(*parser).generatedParserResult = $2 }
+                        { yylex.(*parser).generatedParserResult = $2 }
                 | START_METRIC_SELECTOR vector_selector
                         { yylex.(*parser).generatedParserResult = $2 }
                 | start EOF
@@ -219,43 +191,106 @@ start           :
                         { yylex.(*parser).unexpected("","") }
                 ;
 
-// cmnt: COMMENT
-//         {
-//                 fmt.Println("into the cmnt")
-//                 fmt.Println("comment is --- ", $1.Val)
-//                 // yylex.(*parser).generatedParserResult = $1
-//                 // ce := &CommentExpr{
-//                 //                 Comment: $1.Val,
-//                 //                 PosRange: $1.PositionRange(),
-//                 //         }
-//                 // // yylex.(*parser).comments = append(yylex.(*parser).comments, ce)
-//                 $$ = $1.Val
-//         }
-
 expr            :
                 aggregate_expr
-                | binary_expr
-                | function_call
-                | matrix_selector
-                | number_literal
-                | offset_expr
-                | paren_expr
-                | string_literal
-                | subquery_expr
-                | unary_expr
-                | vector_selector
-                | vector_selector COMMENT
-                {
-                        fmt.Println("this being here ", $2)
-                        ce :=  &CommentExpr{
+                | aggregate_expr COMMENT
+                        {
+                        $$ =  &CommentExpr{
                                 Comment: $2.Val,
                                 Expr: $1.(Expr),
                                 PosRange: $2.PositionRange(),
                         }
-                        fmt.Println("ce is ", ce)
-                        fmt.Println("and its expr is ", ce.Expr)
-                        $$ = ce
-                }
+                        }
+                | binary_expr
+                | binary_expr COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | function_call
+                | function_call COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | matrix_selector
+                | matrix_selector COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | number_literal
+                | number_literal COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | offset_expr
+                | offset_expr COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | paren_expr
+                | paren_expr COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | string_literal
+                | string_literal COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | subquery_expr
+                | subquery_expr COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | unary_expr 
+                | unary_expr COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
+                | vector_selector
+                | vector_selector COMMENT
+                        {
+                        $$ =  &CommentExpr{
+                                Comment: $2.Val,
+                                Expr: $1.(Expr),
+                                PosRange: $2.PositionRange(),
+                        }
+                        }
                 ;
 
 /*
@@ -523,7 +558,6 @@ unary_expr      :
 
 vector_selector: metric_identifier label_matchers
                         {
-                        fmt.Println("vector selector 1")
                         vs := $2.(*VectorSelector)
                         vs.PosRange = mergeRanges(&$1, vs)
                         vs.Name = $1.Val
@@ -532,7 +566,6 @@ vector_selector: metric_identifier label_matchers
                         }
                 | metric_identifier
                         {
-                        fmt.Println("vector selector 2")
                         vs := &VectorSelector{
                                 Name: $1.Val,
                                 LabelMatchers: []*labels.Matcher{},
@@ -541,25 +574,6 @@ vector_selector: metric_identifier label_matchers
                         yylex.(*parser).assembleVectorSelector(vs)
                         $$ = vs
                         }
-                // | metric_identifier cmnt
-                //         {
-                //         fmt.Println("vector selector 3")
-                //         vs := &VectorSelector{
-                //                 Name: $1.Val,
-                //                 LabelMatchers: []*labels.Matcher{},
-                //                 PosRange: $1.PositionRange(),
-                //         }
-                //         yylex.(*parser).assembleVectorSelector(vs)
-                //         ce :=  &CommentExpr{
-                //                 Comment: $2.Val,
-                //                 Expr: vs,
-                //                 PosRange: $2.PositionRange(),
-                //         }
-                //         fmt.Println("ce is ", ce)
-                //         fmt.Println("and its expr is ", ce.Expr)
-                //         $$ = ce
-                //         // $$ = vs
-                //         }
                 | label_matchers
                         {
                         vs := $1.(*VectorSelector)
