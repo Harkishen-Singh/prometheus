@@ -16,6 +16,7 @@ package parser
 import (
 	"fmt"
 	"os"
+
 	// "reflect"
 	"runtime"
 	"strconv"
@@ -49,7 +50,7 @@ type parser struct {
 	yyParser yyParserImpl
 
 	generatedParserResult interface{}
-	comments []interface{}
+	comments              []interface{}
 	parseErrors           ParseErrors
 }
 
@@ -114,6 +115,21 @@ func ParseExpr(input string) (expr Expr, err error) {
 	fmt.Println(parseResult)
 	fmt.Println("comments below")
 	fmt.Println(p.comments)
+	// var cc interface{}
+	// cc := &CommentExpr{
+	// 	Comment: "# comment",
+	// 	Expr: &VectorSelector{
+	// 		Name: "go_goroutines",
+	// 	},
+	// }
+	// fmt.Println("ppppp")
+	// cc := parseResult.(Expr)
+	// fmt.Println(cc)
+	// switch node := cc.(type) {
+	// case *CommentExpr:
+	// 	fmt.Println("ppppp")
+	// 	fmt.Println(node.Expr)
+	// }
 
 	if parseResult != nil {
 		expr = parseResult.(Expr)
@@ -129,6 +145,10 @@ func ParseExpr(input string) (expr Expr, err error) {
 	}
 
 	fmt.Println("expr is ", expr)
+	// vs, ok := expr.(*VectorSelector)
+	// fmt.Println(ok)
+	// fmt.Println("series is ", vs.Series)
+	// fmt.Println("unepanded is ", vs.UnexpandedSeriesSet)
 
 	return expr, err
 }
@@ -572,7 +592,8 @@ func (p *parser) checkAST(node Node) (typ ValueType) {
 		}
 
 	case *CommentExpr:
-		return ""
+		fmt.Println("ast CommentExpr")
+		p.checkAST(n.Expr)
 
 	case *ParenExpr:
 		p.checkAST(n.Expr)

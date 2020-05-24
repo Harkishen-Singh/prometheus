@@ -106,7 +106,7 @@ type BinaryExpr struct {
 }
 
 type CommentExpr struct {
-	Node
+	Expr Expr
 	Comment string
 	PosRange PositionRange
 }
@@ -196,7 +196,7 @@ func (TestStmt) PositionRange() PositionRange {
 }
 func (e *AggregateExpr) Type() ValueType  { return ValueTypeVector }
 func (e *Call) Type() ValueType           { return e.Func.ReturnType }
-func (e *CommentExpr) Type() ValueType	  { return ValueTypeScalar }
+func (e *CommentExpr) Type() ValueType	  { return ValueTypeVector }
 func (e *MatrixSelector) Type() ValueType { return ValueTypeMatrix }
 func (e *SubqueryExpr) Type() ValueType   { return ValueTypeMatrix }
 func (e *NumberLiteral) Type() ValueType  { return ValueTypeScalar }
@@ -347,6 +347,8 @@ func Children(node Node) []Node {
 			ret[i] = e
 		}
 		return ret
+	case *CommentExpr:
+		return []Node{n.Expr}
 	case *SubqueryExpr:
 		return []Node{n.Expr}
 	case *ParenExpr:
@@ -355,7 +357,7 @@ func Children(node Node) []Node {
 		return []Node{n.Expr}
 	case *MatrixSelector:
 		return []Node{n.VectorSelector}
-	case *CommentExpr, *NumberLiteral, *StringLiteral, *VectorSelector:
+	case *NumberLiteral, *StringLiteral, *VectorSelector:
 		// nothing to do
 		return []Node{}
 	default:
