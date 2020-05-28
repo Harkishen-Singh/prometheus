@@ -1,12 +1,17 @@
 package prettier
 
 import (
+	"fmt"
 	"io/ioutil"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/rulefmt"
 	"github.com/prometheus/prometheus/promql/parser"
 )
@@ -88,14 +93,63 @@ func (p *Prettier) Prettify(expr parser.Expr, indent int, init string) (string, 
 			}
 			format += grps + " ("
 		} else {
-			format += "(\n" + padding(indent+2) + paramVal + ",\n" + padding(indent+2)
+			format += "(\n" + padding(indent+1) + paramVal + ",\n" + padding(indent+1)
 		}
-		s, err := p.Prettify(n.Expr, indent+2, format)
+		s, err := p.Prettify(n.Expr, indent+1, format)
 		if err != nil {
 			return "", err
 		}
 		s += "\n" + padding(indent) + ")"
 		return s, nil
+	case *parser.BinaryExpr:
+		op, err := getItemStringified(n.Op)
+		if err != nil {
+			return "", errors.Wrap(err, "unable to prettify")
+		}
+		lhs, err := p.Prettify(n.LHS, indent+1, "")
+		if err != nil {
+			return "", errors.Wrap(err, "unable to prettify")
+		}
+		rhs, err := p.Prettify(n.RHS, indent+1, "")
+		if err != nil {
+			return "", errors.Wrap(err, "unable to prettify")
+		}
+		format := padding(indent+1) + lhs
+		format += padding(indent + 1)
+		format += "\n" + padding(indent) + op + "\n" + padding(indent+1)
+		if n.ReturnBool {
+			format += "bool"
+		}
+		format += rhs
+		return format, nil
+	case *parser.VectorSelector:
+		var containsLabels bool
+		metricName, err := getMetricName(n.LabelMatchers)
+		if err != nil {
+			return "", err
+		}
+		if len(n.LabelMatchers) > 1 {
+			containsLabels = true
+		}
+		format := metricName
+		if containsLabels {
+			format += "{\n"
+			// apply labels
+			labelMatchers := sortLabels(n.LabelMatchers)
+			for _, m := range labelMatchers {
+				format += padding(indent + 1)
+				format += m.Name + ":" + m.Value + ",\n"
+			}
+			format += padding(indent) + "}"
+		}
+		if n.Offset.String() != "0s" {
+			t, err := getTimeValueStringified(n.Offset)
+			if err != nil {
+				return "", errors.Wrap(err, "invalid time")
+			}
+			format += " offset " + t
+		}
+		return format, nil
 	}
 	return init, nil
 }
@@ -129,8 +183,46 @@ func getItemStringified(typ parser.ItemType) (string, error) {
 	return "", errors.New("invalid item-type")
 }
 
+func getMetricName(l []*labels.Matcher) (string, error) {
+	for _, m := range l {
+		if m.Name == model.MetricNameLabel {
+			return m.Value, nil
+		}
+	}
+	return "", errors.New("metric_name not found")
+}
+
 func parseFloat(v float64) string {
 	return strconv.FormatFloat(v, 'E', -1, 64)
+}
+
+func sortLabels(l []*labels.Matcher) (sortedLabels []*labels.Matcher) {
+	var labelName []string
+	for _, m := range l {
+		if m.Name == model.MetricNameLabel {
+			continue
+		}
+		labelName = append(labelName, m.Name)
+	}
+	sort.Strings(labelName)
+	for _, n := range labelName {
+		for _, m := range l {
+			if n == m.Name {
+				sortedLabels = append(sortedLabels, m)
+			}
+		}
+	}
+	return
+}
+
+func getTimeValueStringified(d time.Duration) (string, error) {
+	units := []string{"y", "w", "d", "h", "m", "s"}
+	for _, u := range units {
+		if i := strings.Index(d.String(), u); i != -1 {
+			return d.String()[:i+1], nil
+		}
+	}
+	return "", fmt.Errorf("%s", d.String())
 }
 
 func padding(itr int) string {
