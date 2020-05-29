@@ -84,7 +84,7 @@ func (p *Prettier) Prettify(expr parser.Expr, indent int, init string) (string, 
 			grps = ")"
 		}
 
-		format := op
+		format := padding(indent) + op
 		if !containsParam {
 			if without {
 				format += " without "
@@ -115,7 +115,6 @@ func (p *Prettier) Prettify(expr parser.Expr, indent int, init string) (string, 
 			return "", errors.Wrap(err, "unable to prettify")
 		}
 		format := padding(indent+1) + lhs
-		format += padding(indent + 1)
 		format += "\n" + padding(indent) + op + "\n" + padding(indent+1)
 		if n.ReturnBool {
 			format += "bool"
@@ -131,7 +130,7 @@ func (p *Prettier) Prettify(expr parser.Expr, indent int, init string) (string, 
 		if len(n.LabelMatchers) > 1 {
 			containsLabels = true
 		}
-		format := metricName
+		format := padding(indent) + metricName
 		if containsLabels {
 			format += "{\n"
 			// apply labels
