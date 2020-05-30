@@ -29,6 +29,7 @@ const (
 type Prettier struct {
 	files      []string
 	expression string
+	Type uint
 }
 
 // New returns a new prettier over the given slice of files.
@@ -37,12 +38,15 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 		ok         bool
 		files      []string
 		expression string
+		typ uint
 	)
 	switch Type {
 	case PrettifyRules:
 		files, ok = content.([]string)
+		typ = PrettifyRules
 	case PrettifyExpression:
 		expression, ok = content.(string)
+		typ = PrettifyExpression
 	}
 	if !ok {
 		return nil, errors.Errorf("invalid type: %T", reflect.TypeOf(content))
@@ -50,14 +54,19 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 	return &Prettier{
 		files:      files,
 		expression: expression,
+		Type: typ,
 	}, nil
 }
 
 // Prettify implements the formatting of the expressions.
 // TODO: Add support for indetation via tabs/spaces as choices.
-func (p *Prettier) Prettify(expr parser.Expr, indent int, init string) (string, error) {
+func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int, init string) (string, error) {
+	fmt.Println(expr)
 	switch n := expr.(type) {
 	case *parser.AggregateExpr:
+		if prevType.String() == "*parser.AggregateExpr" {
+			indent--
+		}
 		op, err := getItemStringified(n.Op)
 		if err != nil {
 			return "", errors.Wrap(err, "unable to prettify")
@@ -95,26 +104,30 @@ func (p *Prettier) Prettify(expr parser.Expr, indent int, init string) (string, 
 		} else {
 			format += "(\n" + padding(indent+1) + paramVal + ",\n" + padding(indent+1)
 		}
-		s, err := p.Prettify(n.Expr, indent+1, format)
+		s, err := p.Prettify(n.Expr, reflect.TypeOf(expr), indent+1, format)
 		if err != nil {
 			return "", err
 		}
 		s += "\n" + padding(indent) + ")"
 		return s, nil
 	case *parser.BinaryExpr:
-		op, err := getItemStringified(n.Op)
-		if err != nil {
-			return "", errors.Wrap(err, "unable to prettify")
+		if prevType.String() == "*parser.BinaryExpr" {
+			fmt.Println("in it")
+			indent--
 		}
-		lhs, err := p.Prettify(n.LHS, indent+1, "")
-		if err != nil {
-			return "", errors.Wrap(err, "unable to prettify")
+		op, ok := (*parser.ItemTyp)[n.Op]
+		if !ok {
+			return "", errors.New("invalid item-type")
 		}
-		rhs, err := p.Prettify(n.RHS, indent+1, "")
+		lhs, err := p.Prettify(n.LHS, reflect.TypeOf(expr), indent+1, "")
 		if err != nil {
-			return "", errors.Wrap(err, "unable to prettify")
+			return "", errors.Wrap(err, "unable to prettify2")
 		}
-		format := padding(indent+1) + lhs
+		rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), indent+1, "")
+		if err != nil {
+			return "", errors.Wrap(err, "unable to prettify3")
+		}
+		format := padding(indent) + lhs
 		format += "\n" + padding(indent) + op + "\n" + padding(indent+1)
 		if n.ReturnBool {
 			format += "bool"
@@ -151,6 +164,52 @@ func (p *Prettier) Prettify(expr parser.Expr, indent int, init string) (string, 
 		return format, nil
 	}
 	return init, nil
+}
+
+type ruleGroupFiles struct {
+	filename string
+	ruleGroups *rulefmt.RuleGroups
+}
+
+// Run executes the prettier over the rules files or expression.
+func (p *Prettier) Run() []error {
+	var (
+		groupFiles []*rulefmt.RuleGroups
+		errs []error
+	)
+	switch p.Type {
+	case PrettifyRules:
+		for _, f := range p.files {
+			ruleGroups, err := p.parseFile(f)
+			if err != nil {
+				errs = append(errs, errors.Wrapf(err, "file: %s", f))
+			}
+			groupFiles = append(groupFiles, ruleGroups)
+		}
+		if errs != nil {
+			return errs
+		}
+		for _, rgs := range groupFiles {
+			for _, grps := range rgs.Groups {
+				for _, rules := range grps.Rules {
+					exprStr := rules.Expr.Value
+					expr, err := p.parseExpr(exprStr)
+					if err != nil {
+						return []error{errors.Wrap(err, "parse error")}
+					}
+					formattedExpr, err := p.Prettify(expr, reflect.TypeOf(expr), 0, "")
+					if err != nil {
+						return []error{errors.Wrap(err, "prettier error")}
+					}
+					fmt.Println("raw \n", formattedExpr)
+
+					rules.Expr.SetString(formattedExpr)
+				}
+			}
+		}
+		
+	}
+	return nil
 }
 
 func (p *Prettier) parseExpr(expression string) (parser.Expr, error) {
@@ -225,7 +284,9 @@ func getTimeValueStringified(d time.Duration) (string, error) {
 }
 
 func padding(itr int) string {
-	if itr < 1 {
+	if itr == 0 {
+		fmt.Println("itr is ", itr)
+		// panic("negative-indentation")
 		return ""
 	}
 	pad := "  " // 2 spaces

@@ -34,6 +34,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/client_golang/prometheus/testutil/promlint"
+	"github.com/prometheus/prometheus/promql/prettier"
 	config_util "github.com/prometheus/common/config"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/common/version"
@@ -66,7 +67,8 @@ func main() {
 
 	prettifyCmd := app.Command("prettify", "Prettify PromQL expressions and YAML syntax.")
 	prettifyRuleFiles := prettifyCmd.Command("rules", "Format and prettify rule files.")
-	prettifyPromqlExpression := prettifyCmd.Command("expression", "Prettify a Promql Expression.") // TODO (harkishen).
+	prettyFiles := prettifyRuleFiles.Arg("rule-files", "The rule files to prettify.").Required().ExistingFiles()
+	prettifyPromqlExpression := prettifyCmd.Command("expression", "Prettify a Promql Expression.") // TODO
 
 	queryCmd := app.Command("query", "Run query against a Prometheus server.")
 	queryCmdFmt := queryCmd.Flag("format", "Output format of the query.").Short('o').Default("promql").Enum("promql", "json")
@@ -130,7 +132,7 @@ func main() {
 		os.Exit(CheckMetrics())
 
 	case prettifyRuleFiles.FullCommand():
-		os.Exit(0)
+		os.Exit(PrettifyRules(*prettyFiles...))
 
 	case prettifyPromqlExpression.FullCommand():
 		os.Exit(0)
@@ -393,6 +395,22 @@ func CheckMetrics() int {
 		return 3
 	}
 
+	return 0
+}
+
+// PrettifyRules prettifies the rule files.
+func PrettifyRules(files ...string) int {
+	pretty, err := prettier.New(prettier.PrettifyRules, files)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+	}
+	if errs := pretty.Run(); len(errs) != 0 {
+		for _, err := range errs {
+			fmt.Fprintln(os.Stderr, err.Error())
+		}
+		fmt.Println("Failed formatting rule files.")
+		return 1
+	}
 	return 0
 }
 

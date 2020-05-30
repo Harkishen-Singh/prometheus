@@ -157,6 +157,8 @@ var ItemTypeStr = map[ItemType]string{
 	POW:       "^",
 }
 
+var ItemTyp = &ItemTypeStr
+
 func init() {
 	// Add keywords to Item type strings.
 	for s, ty := range key {
