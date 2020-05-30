@@ -29,7 +29,7 @@ const (
 type Prettier struct {
 	files      []string
 	expression string
-	Type uint
+	Type       uint
 }
 
 // New returns a new prettier over the given slice of files.
@@ -38,7 +38,7 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 		ok         bool
 		files      []string
 		expression string
-		typ uint
+		typ        uint
 	)
 	switch Type {
 	case PrettifyRules:
@@ -54,9 +54,10 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 	return &Prettier{
 		files:      files,
 		expression: expression,
-		Type: typ,
+		Type:       typ,
 	}, nil
 }
+
 var i = 0
 
 // Prettify implements the formatting of the expressions.
@@ -112,8 +113,8 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		s += "\n" + padding(indent) + ")"
 	case *parser.BinaryExpr:
 		var (
-			indentChild = indent+1
-			isFirst = true
+			indentChild = indent + 1
+			isFirst     = true
 		)
 		if prevType.String() == "*parser.BinaryExpr" {
 			indentChild--
@@ -159,10 +160,10 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			// apply labels
 			labelMatchers := sortLabels(n.LabelMatchers)
 			for _, m := range labelMatchers {
-				format += padding(indent + 1)
-				format += m.Name + ":" + m.Value + ",\n"
+				format += padding(indent + 2)
+				format += m.Name + "=\"" + m.Value + "\",\n"
 			}
-			format += padding(indent) + "}"
+			format += padding(indent+1) + "}"
 		}
 		if n.Offset.String() != "0s" {
 			t, err := getTimeValueStringified(n.Offset)
@@ -172,17 +173,11 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			format += " offset " + t
 		}
 	}
-	format = strings.Trim(format, "\n")
-	if strings.Count(format, "\n") > 1 {
-		format = fmt.Sprintf("\n%s", format)
-		format = strings.Replace(format, "\n  \n", "\n  ", 1)
-		return format, nil
-	}
 	return format, nil
 }
 
 type ruleGroupFiles struct {
-	filename string
+	filename   string
 	ruleGroups *rulefmt.RuleGroups
 }
 
@@ -190,14 +185,16 @@ type ruleGroupFiles struct {
 func (p *Prettier) Run() []error {
 	var (
 		groupFiles []*rulefmt.RuleGroups
-		errs []error
+		errs       []error
 	)
 	switch p.Type {
 	case PrettifyRules:
 		for _, f := range p.files {
 			ruleGroups, err := p.parseFile(f)
 			if err != nil {
-				errs = append(errs, errors.Wrapf(err, "file: %s", f))
+				for _, e := range err {
+					errs = append(errs, errors.Wrapf(e, "file: %s", f))
+				}
 			}
 			groupFiles = append(groupFiles, ruleGroups)
 		}
@@ -223,7 +220,7 @@ func (p *Prettier) Run() []error {
 				}
 			}
 		}
-		
+
 	}
 	return nil
 }
@@ -236,14 +233,14 @@ func (p *Prettier) parseExpr(expression string) (parser.Expr, error) {
 	return expr, nil
 }
 
-func (p *Prettier) parseFile(name string) (*rulefmt.RuleGroups, error) {
+func (p *Prettier) parseFile(name string) (*rulefmt.RuleGroups, []error) {
 	b, err := ioutil.ReadFile(name)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read file")
+		return nil, []error{errors.Wrap(err, "unable to read file")}
 	}
 	groups, errs := rulefmt.Parse(b)
 	if errs != nil {
-		return nil, errors.New("invalid rule files. consider checking rules for errors before prettifying")
+		return nil, errs
 	}
 	return groups, nil
 }
