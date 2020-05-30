@@ -57,11 +57,11 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 		Type: typ,
 	}, nil
 }
+var i = 0
 
 // Prettify implements the formatting of the expressions.
 // TODO: Add support for indetation via tabs/spaces as choices.
 func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int, init string) (string, error) {
-	fmt.Println(expr)
 	switch n := expr.(type) {
 	case *parser.AggregateExpr:
 		if prevType.String() == "*parser.AggregateExpr" {
@@ -111,24 +111,35 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		s += "\n" + padding(indent) + ")"
 		return s, nil
 	case *parser.BinaryExpr:
+		var (
+			indentChild = indent+1
+			isFirst = true
+		)
 		if prevType.String() == "*parser.BinaryExpr" {
-			fmt.Println("in it")
-			indent--
+			indentChild--
+			isFirst = false
 		}
+
 		op, ok := (*parser.ItemTyp)[n.Op]
 		if !ok {
 			return "", errors.New("invalid item-type")
 		}
-		lhs, err := p.Prettify(n.LHS, reflect.TypeOf(expr), indent+1, "")
+		lhs, err := p.Prettify(n.LHS, reflect.TypeOf(expr), indentChild, "")
 		if err != nil {
 			return "", errors.Wrap(err, "unable to prettify2")
 		}
-		rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), indent+1, "")
+		rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), indentChild, "")
 		if err != nil {
 			return "", errors.Wrap(err, "unable to prettify3")
 		}
-		format := padding(indent) + lhs
-		format += "\n" + padding(indent) + op + "\n" + padding(indent+1)
+
+		format := ""
+		if isFirst {
+			indent++
+			format += padding(indent)
+		}
+		format += lhs
+		format += "\n" + padding(indent) + op + "\n" + padding(indent)
 		if n.ReturnBool {
 			format += "bool"
 		}
@@ -161,6 +172,7 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			}
 			format += " offset " + t
 		}
+		fmt.Println("sent as ", format)
 		return format, nil
 	}
 	return init, nil
@@ -197,11 +209,12 @@ func (p *Prettier) Run() []error {
 					if err != nil {
 						return []error{errors.Wrap(err, "parse error")}
 					}
-					formattedExpr, err := p.Prettify(expr, reflect.TypeOf(expr), 0, "")
+					fmt.Printf("%v\n", expr)
+					formattedExpr, err := p.Prettify(expr, reflect.TypeOf(""), 0, "")
 					if err != nil {
 						return []error{errors.Wrap(err, "prettier error")}
 					}
-					fmt.Println("raw \n", formattedExpr)
+					fmt.Println("raw\n", formattedExpr)
 
 					rules.Expr.SetString(formattedExpr)
 				}
@@ -285,12 +298,10 @@ func getTimeValueStringified(d time.Duration) (string, error) {
 
 func padding(itr int) string {
 	if itr == 0 {
-		fmt.Println("itr is ", itr)
-		// panic("negative-indentation")
 		return ""
 	}
-	pad := "  " // 2 spaces
-	for i := 1; i < itr; i++ {
+	pad := " "
+	for i := 1; i <= itr; i++ {
 		pad += pad
 	}
 	return pad
