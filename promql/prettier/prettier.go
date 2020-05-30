@@ -62,6 +62,7 @@ var i = 0
 // Prettify implements the formatting of the expressions.
 // TODO: Add support for indetation via tabs/spaces as choices.
 func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int, init string) (string, error) {
+	var format string
 	switch n := expr.(type) {
 	case *parser.AggregateExpr:
 		if prevType.String() == "*parser.AggregateExpr" {
@@ -93,7 +94,7 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			grps = ")"
 		}
 
-		format := padding(indent) + op
+		format = padding(indent) + op
 		if !containsParam {
 			if without {
 				format += " without "
@@ -109,7 +110,6 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			return "", err
 		}
 		s += "\n" + padding(indent) + ")"
-		return s, nil
 	case *parser.BinaryExpr:
 		var (
 			indentChild = indent+1
@@ -133,7 +133,7 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			return "", errors.Wrap(err, "unable to prettify3")
 		}
 
-		format := ""
+		format = ""
 		if isFirst {
 			indent++
 			format += padding(indent)
@@ -144,7 +144,6 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			format += "bool"
 		}
 		format += rhs
-		return format, nil
 	case *parser.VectorSelector:
 		var containsLabels bool
 		metricName, err := getMetricName(n.LabelMatchers)
@@ -154,7 +153,7 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		if len(n.LabelMatchers) > 1 {
 			containsLabels = true
 		}
-		format := padding(indent) + metricName
+		format = padding(indent) + metricName
 		if containsLabels {
 			format += "{\n"
 			// apply labels
@@ -172,10 +171,14 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			}
 			format += " offset " + t
 		}
-		fmt.Println("sent as ", format)
+	}
+	format = strings.Trim(format, "\n")
+	if strings.Count(format, "\n") > 1 {
+		format = fmt.Sprintf("\n%s", format)
+		format = strings.Replace(format, "\n  \n", "\n  ", 1)
 		return format, nil
 	}
-	return init, nil
+	return format, nil
 }
 
 type ruleGroupFiles struct {

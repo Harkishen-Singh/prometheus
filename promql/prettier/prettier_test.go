@@ -20,8 +20,7 @@ var exprs = []prettierTest{
   +
     second
   +
-    third
-		`,
+    third`,
 	},
 }
 
