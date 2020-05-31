@@ -90,8 +90,8 @@ var exprs = []prettierTest{
     )
   )
 )`,
-  },
-  {
+	},
+	{
 		expr: `((((first{foo="bar",a="b", c="d"} + ((second{foo="bar", c="d"}))))))`,
 		expected: `(
   (
@@ -115,8 +115,8 @@ var exprs = []prettierTest{
     )
   )
 )`,
-  },
-  {
+	},
+	{
 		expr: `((((first{foo="bar",a="b", c="d"} + ((second{foo="bar", c="d"})) + third{foo="bar",c="d"}))))`,
 		expected: `(
   (
@@ -149,13 +149,13 @@ var exprs = []prettierTest{
 }
 
 func TestPrettify(t *testing.T) {
-    for _, expr := range exprs {
-        p, err := New(PrettifyExpression, expr.expr)
-        testutil.Ok(t, err)
-        expression, err := p.parseExpr(expr.expr)
-        testutil.Ok(t, err)
-        formatted, err := p.Prettify(expression, reflect.TypeOf(""), 0, "")
-        testutil.Ok(t, err)
-        testutil.Equals(t, expr.expected, formatted, "formatting does not match")
-    }
+	for _, expr := range exprs {
+		p, err := New(PrettifyExpression, expr.expr)
+		testutil.Ok(t, err)
+		expression, err := p.parseExpr(expr.expr)
+		testutil.Ok(t, err)
+		formatted, err := p.Prettify(expression, reflect.TypeOf(""), 0, "")
+		testutil.Ok(t, err)
+		testutil.Equals(t, expr.expected, formatted, "formatting does not match")
+	}
 }

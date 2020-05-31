@@ -669,6 +669,7 @@ func lexLineComment(l *Lexer) stateFn {
 	}
 	l.backup()
 	l.emit(COMMENT)
+	fmt.Println("emitter ", l.itemp)
 	return lexStatements
 }
 

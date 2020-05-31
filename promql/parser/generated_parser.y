@@ -17,6 +17,7 @@ package parser
 import (
         "math"
         "sort"
+        "fmt"
         "strconv"
         "time"
 
@@ -166,6 +167,7 @@ start           :
                 | START_EXPRESSION COMMENT
                         {
                                 ce := &CommentExpr{
+                                        IsHead: true,
                                         Comment: $2.Val,
                                         PosRange: $2.PositionRange(),
                                 }
@@ -174,6 +176,7 @@ start           :
                 | START_EXPRESSION COMMENT expr 
                         {
                                 ce := &CommentExpr{
+                                        IsHead: true,
                                         Comment: $2.Val,
                                         Expr: $3.(Expr),
                                         PosRange: $3.PositionRange(),
@@ -284,15 +287,16 @@ expr            :
                                 PosRange: $2.PositionRange(),
                         }
                         }
-                | vector_selector
                 | vector_selector COMMENT
                         {
+                        fmt.Println("vecotr")
                         $$ =  &CommentExpr{
                                 Comment: $2.Val,
                                 Expr: $1.(Expr),
                                 PosRange: $2.PositionRange(),
                         }
                         }
+                | vector_selector { fmt.Println("plain vector") }
                 ;
 
 /*
@@ -724,7 +728,9 @@ series_item     : BLANK
                         }
                 ;
 
-series_value    : IDENTIFIER
+series_value    : 
+                COMMENT { fmt.Println("auxillary") }
+                | IDENTIFIER
                         {
                         if $1.Val != "stale" {
                                 yylex.(*parser).unexpected("series values", "number or \"stale\"")

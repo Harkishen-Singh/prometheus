@@ -61,7 +61,7 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 var i = 0
 
 // Prettify implements the formatting of the expressions.
-// TODO: Add support for indetation via tabs/spaces as choices.
+// TODO: Add support for indentation via tabs/spaces as choices.
 func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int, init string) (string, error) {
 	var format string
 	switch n := expr.(type) {
@@ -129,10 +129,6 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		if err != nil {
 			return "", errors.Wrap(err, "unable to prettify2")
 		}
-		rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), indentChild, "")
-		if err != nil {
-			return "", errors.Wrap(err, "unable to prettify3")
-		}
 
 		format = ""
 		if isFirst {
@@ -141,9 +137,31 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		format += lhs
 		format += "\n" + padding(indent-1) + op + "\n"
 		if n.ReturnBool {
-			format += "bool"
+			rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), 0, "")
+			if err != nil {
+				return "", errors.Wrap(err, "unable to prettify3")
+			}
+			format += padding(indentChild) + "bool " + rhs
+		} else {
+			rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), indentChild, "")
+			if err != nil {
+				return "", errors.Wrap(err, "unable to prettify3")
+			}
+			format += rhs
 		}
-		format += rhs
+	case *parser.CommentExpr:
+		fmt.Println("inside comment expr")
+		s, err := p.Prettify(n.Expr, reflect.TypeOf(n), indent, format)
+		if err != nil {
+			return "", err
+		}
+		format += padding(indent)
+		if n.IsHead {
+			format += n.Comment + "\n"
+			format += padding(indent) + s + "\n"
+		} else {
+			format += strings.TrimSpace(s) + " " + n.Comment
+		}
 	case *parser.VectorSelector:
 		var containsLabels bool
 		metricName, err := getMetricName(n.LabelMatchers)

@@ -800,6 +800,7 @@ func (ev *evaluator) error(err error) {
 
 // recover is the handler that turns panics into returns from the top level of evaluation.
 func (ev *evaluator) recover(errp *error) {
+	fmt.Println("from recover")
 	e := recover()
 	if e == nil {
 		return

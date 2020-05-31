@@ -106,6 +106,7 @@ type BinaryExpr struct {
 }
 
 type CommentExpr struct {
+	IsHead   bool
 	Expr     Expr
 	Comment  string
 	PosRange PositionRange
