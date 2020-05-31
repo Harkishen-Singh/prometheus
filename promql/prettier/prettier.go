@@ -129,26 +129,22 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		if err != nil {
 			return "", errors.Wrap(err, "unable to prettify2")
 		}
+		rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), indentChild, "")
+		if err != nil {
+			return "", errors.Wrap(err, "unable to prettify3")
+		}
 
 		format = ""
 		if isFirst {
 			indent++
 		}
 		format += lhs
-		format += "\n" + padding(indent-1) + op + "\n"
 		if n.ReturnBool {
-			rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), 0, "")
-			if err != nil {
-				return "", errors.Wrap(err, "unable to prettify3")
-			}
-			format += padding(indentChild) + "bool " + rhs
+			format += "\n" + padding(indent-1) + op + " bool\n"
 		} else {
-			rhs, err := p.Prettify(n.RHS, reflect.TypeOf(expr), indentChild, "")
-			if err != nil {
-				return "", errors.Wrap(err, "unable to prettify3")
-			}
-			format += rhs
+			format += "\n" + padding(indent-1) + op + "\n"
 		}
+		format += rhs
 	case *parser.CommentExpr:
 		fmt.Println("inside comment expr")
 		s, err := p.Prettify(n.Expr, reflect.TypeOf(n), indent, format)
