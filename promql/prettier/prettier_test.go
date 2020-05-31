@@ -90,6 +90,61 @@ var exprs = []prettierTest{
     )
   )
 )`,
+  },
+  {
+		expr: `((((first{foo="bar",a="b", c="d"} + ((second{foo="bar", c="d"}))))))`,
+		expected: `(
+  (
+    (
+      (
+          first{
+            a="b",
+            c="d",
+            foo="bar",
+          }
+        +
+          (
+            (
+              second{
+                c="d",
+                foo="bar",
+              }
+            )
+          )
+      )
+    )
+  )
+)`,
+  },
+  {
+		expr: `((((first{foo="bar",a="b", c="d"} + ((second{foo="bar", c="d"})) + third{foo="bar",c="d"}))))`,
+		expected: `(
+  (
+    (
+      (
+          first{
+            a="b",
+            c="d",
+            foo="bar",
+          }
+        +
+          (
+            (
+              second{
+                c="d",
+                foo="bar",
+              }
+            )
+          )
+        +
+          third{
+            c="d",
+            foo="bar",
+          }
+      )
+    )
+  )
+)`,
 	},
 }
 
