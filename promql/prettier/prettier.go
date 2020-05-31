@@ -160,10 +160,10 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			// apply labels
 			labelMatchers := sortLabels(n.LabelMatchers)
 			for _, m := range labelMatchers {
-				format += padding(indent + 2)
+				format += padding(indent + 1)
 				format += m.Name + "=\"" + m.Value + "\",\n"
 			}
-			format += padding(indent+1) + "}"
+			format += padding(indent) + "}"
 		}
 		if n.Offset.String() != "0s" {
 			t, err := getTimeValueStringified(n.Offset)
@@ -172,6 +172,15 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 			}
 			format += " offset " + t
 		}
+	case *parser.ParenExpr:
+		format = padding(indent) + "(\n"
+		fmt.Println("previous ", indent, " sending as ", indent+1)
+		s, err := p.Prettify(n.Expr, reflect.TypeOf(n), indent+1, format)
+		if err != nil {
+			return "", err
+		}
+		format += s + "\n"
+		format += padding(indent) + ")"
 	}
 	return format, nil
 }
@@ -300,9 +309,10 @@ func padding(itr int) string {
 	if itr == 0 {
 		return ""
 	}
-	pad := " "
+	pad := ""
+	space := "  "
 	for i := 1; i <= itr; i++ {
-		pad += pad
+		pad += space
 	}
 	return pad
 }

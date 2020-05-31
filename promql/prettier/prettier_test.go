@@ -24,32 +24,51 @@ var exprs = []prettierTest{
 	{
 		expr: `first{foo="bar",a="b", c="d"}`,
 		expected: `first{
-    a="b",
-    c="d",
-    foo="bar",
-  }`,
+  a="b",
+  c="d",
+  foo="bar",
+}`,
 	},
 	{
 		expr: `first{c="d",
 			foo="bar",a="b",}`,
 		expected: `first{
+  a="b",
+  c="d",
+  foo="bar",
+}`,
+	},
+	{
+		expr: `first{foo="bar",a="b", c="d"} + second{foo="bar", c="d"}`,
+		expected: `    first{
     a="b",
+    c="d",
+    foo="bar",
+  }
+  +
+    second{
     c="d",
     foo="bar",
   }`,
 	},
 	{
-		expr: `first{foo="bar",a="b", c="d"} + second{foo="bar", c="d"}`,
-		expected: `    first{
-        a="b",
-        c="d",
-        foo="bar",
-    }
-  +
-    second{
-        c="d",
-        foo="bar",
-    }`,
+		expr: `(first)`,
+		expected: `(
+  first
+)`,
+	},
+
+	{
+		expr: `((((first))))`,
+		expected: `(
+  (
+    (
+      (
+        first
+      )
+    )
+  )
+)`,
 	},
 }
 
