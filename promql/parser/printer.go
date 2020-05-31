@@ -46,7 +46,16 @@ func tree(node Node, level string) string {
 }
 
 func (node *CommentExpr) String() string {
-	return node.Comment
+	comments := ""
+	head := node.CommentPtr
+	for {
+		if head == nil {
+			break
+		}
+		comments += head.Comment + "\n"
+		head = head.Addr
+	}
+	return comments
 }
 
 func (node *EvalStmt) String() string {

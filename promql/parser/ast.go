@@ -105,11 +105,16 @@ type BinaryExpr struct {
 	ReturnBool bool
 }
 
+type CommentLinkedList struct {
+	Addr    *CommentLinkedList
+	Comment string
+}
+
 type CommentExpr struct {
-	IsHead   bool
-	Expr     Expr
-	Comment  string
-	PosRange PositionRange
+	IsHead     bool
+	Expr       Expr
+	CommentPtr *CommentLinkedList
+	PosRange   PositionRange
 }
 
 // Call represents a function call.

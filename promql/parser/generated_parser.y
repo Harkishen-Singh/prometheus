@@ -28,6 +28,7 @@ import (
 
 %union {
     node      Node
+    llist     *CommentLinkedList
     item      Item
     matchers  []*labels.Matcher
     matcher   *labels.Matcher
@@ -138,8 +139,9 @@ START_METRIC_SELECTOR
 %type <series> series_item series_values
 %type <uint> uint
 %type <float> number series_value signed_number
-%type <node> aggregate_expr aggregate_modifier bin_modifier binary_expr bool_modifier expr function_call function_call_args function_call_body group_modifiers label_matchers matrix_selector number_literal offset_expr on_or_ignoring paren_expr string_literal subquery_expr unary_expr vector_selector
+%type <node> aggregate_expr aggregate_modifier bin_modifier binary_expr bool_modifier  expr function_call function_call_args function_call_body group_modifiers label_matchers matrix_selector number_literal offset_expr on_or_ignoring paren_expr string_literal subquery_expr unary_expr vector_selector
 %type <duration> duration maybe_duration
+%type <llist> comment_expr
 
 %start start
 
@@ -164,20 +166,19 @@ start           :
                  START_METRIC metric
                         { yylex.(*parser).generatedParserResult = $2 }
                 | START_SERIES_DESCRIPTION series_description
-                | START_EXPRESSION COMMENT
+                | START_EXPRESSION comment_expr
                         {
                                 ce := &CommentExpr{
                                         IsHead: true,
-                                        Comment: $2.Val,
-                                        PosRange: $2.PositionRange(),
+                                        CommentPtr: $2,
                                 }
                                 yylex.(*parser).generatedParserResult = ce
                         }
-                | START_EXPRESSION COMMENT expr 
+                | START_EXPRESSION comment_expr expr 
                         {
                                 ce := &CommentExpr{
                                         IsHead: true,
-                                        Comment: $2.Val,
+                                        CommentPtr: $2,
                                         Expr: $3.(Expr),
                                         PosRange: $3.PositionRange(),
                                 }
@@ -198,105 +199,111 @@ start           :
 
 expr            :
                 aggregate_expr
-                | aggregate_expr COMMENT
+                | aggregate_expr comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
+                        
                         }
                 | binary_expr
-                | binary_expr COMMENT
+                | binary_expr comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | function_call
-                | function_call COMMENT
+                | function_call comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | matrix_selector
-                | matrix_selector COMMENT
+                | matrix_selector comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | number_literal
-                | number_literal COMMENT
+                | number_literal comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | offset_expr
-                | offset_expr COMMENT
+                | offset_expr comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | paren_expr
-                | paren_expr COMMENT
+                | paren_expr comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | string_literal
-                | string_literal COMMENT
+                | string_literal comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | subquery_expr
-                | subquery_expr COMMENT
+                | subquery_expr comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
                 | unary_expr 
-                | unary_expr COMMENT
+                | unary_expr comment_expr
                         {
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
-                | vector_selector COMMENT
+                | vector_selector
+                | vector_selector comment_expr
                         {
-                        fmt.Println("vecotr")
                         $$ =  &CommentExpr{
-                                Comment: $2.Val,
+                                CommentPtr: $2,
                                 Expr: $1.(Expr),
-                                PosRange: $2.PositionRange(),
                         }
                         }
-                | vector_selector { fmt.Println("plain vector") }
+                ;
+
+comment_expr    :
+                COMMENT
+                        {
+                        $$ = &CommentLinkedList{
+                                Comment: $1.Val,
+                                Addr: nil,
+                        }
+                        }
+                | comment_expr COMMENT
+                        {
+                                $$ =  &CommentLinkedList{
+                                        Comment: $2.Val,
+                                        Addr: $1,
+                                } 
+                        }
                 ;
 
 /*
