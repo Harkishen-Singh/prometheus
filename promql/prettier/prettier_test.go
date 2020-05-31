@@ -15,11 +15,11 @@ type prettierTest struct {
 var exprs = []prettierTest{
 	{
 		expr: "first + second + third",
-		expected: `    first
-  +
-    second
-  +
-    third`,
+		expected: `  first
++
+  second
++
+  third`,
 	},
 	{
 		expr: `first{foo="bar",a="b", c="d"}`,
@@ -40,13 +40,13 @@ var exprs = []prettierTest{
 	},
 	{
 		expr: `first{foo="bar",a="b", c="d"} + second{foo="bar", c="d"}`,
-		expected: `    first{
+		expected: `  first{
     a="b",
     c="d",
     foo="bar",
   }
-  +
-    second{
++
+  second{
     c="d",
     foo="bar",
   }`,
@@ -70,16 +70,37 @@ var exprs = []prettierTest{
   )
 )`,
 	},
+	{
+		expr: `((((first{foo="bar",a="b", c="d"} + second{foo="bar", c="d"}))))`,
+		expected: `(
+  (
+    (
+      (
+          first{
+            a="b",
+            c="d",
+            foo="bar",
+          }
+        +
+          second{
+            c="d",
+            foo="bar",
+          }
+      )
+    )
+  )
+)`,
+	},
 }
 
 func TestPrettify(t *testing.T) {
-	for _, expr := range exprs {
-		p, err := New(PrettifyExpression, expr.expr)
-		testutil.Ok(t, err)
-		expression, err := p.parseExpr(expr.expr)
-		testutil.Ok(t, err)
-		formatted, err := p.Prettify(expression, reflect.TypeOf(""), 0, "")
-		testutil.Ok(t, err)
-		testutil.Equals(t, expr.expected, formatted, "formatting does not match")
-	}
+    for _, expr := range exprs {
+        p, err := New(PrettifyExpression, expr.expr)
+        testutil.Ok(t, err)
+        expression, err := p.parseExpr(expr.expr)
+        testutil.Ok(t, err)
+        formatted, err := p.Prettify(expression, reflect.TypeOf(""), 0, "")
+        testutil.Ok(t, err)
+        testutil.Equals(t, expr.expected, formatted, "formatting does not match")
+    }
 }

@@ -137,10 +137,9 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		format = ""
 		if isFirst {
 			indent++
-			format += padding(indent)
 		}
 		format += lhs
-		format += "\n" + padding(indent) + op + "\n" + padding(indent)
+		format += "\n" + padding(indent-1) + op + "\n"
 		if n.ReturnBool {
 			format += "bool"
 		}
