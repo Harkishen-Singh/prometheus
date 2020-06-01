@@ -146,12 +146,10 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		}
 		format += rhs
 	case *parser.CommentExpr:
-		fmt.Println("inside comment expr")
 		s, err := p.Prettify(n.Expr, reflect.TypeOf(n), indent, format)
 		if err != nil {
 			return "", err
 		}
-		// format += padding(indent)
 		head := n.CommentPtr
 		if n.IsHead {
 			for {
@@ -168,20 +166,15 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 				if head == nil {
 					break
 				}
-				fmt.Println("head comment is ", head.Comment)
-				fmt.Println(format)
 				if !firstRead {
 					firstRead = true
 					format += s + " " + head.Comment
 				} else {
 					format += "\n" + padding(indent) + head.Comment
 				}
-				// format += "\n"
 				head = head.Addr
 			}
 		}
-		fmt.Println("comment_expr below")
-		fmt.Println(format)
 	case *parser.VectorSelector:
 		var containsLabels bool
 		metricName, err := getMetricName(n.LabelMatchers)
@@ -211,7 +204,6 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		}
 	case *parser.ParenExpr:
 		format = padding(indent) + "(\n"
-		fmt.Println("previous ", indent, " sending as ", indent+1)
 		s, err := p.Prettify(n.Expr, reflect.TypeOf(n), indent+1, format)
 		if err != nil {
 			return "", err

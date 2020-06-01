@@ -17,7 +17,6 @@ package parser
 import (
         "math"
         "sort"
-        "fmt"
         "strconv"
         "time"
 
@@ -180,7 +179,6 @@ start           :
                                 IsHead: true,
                                 CommentPtr: $2,
                                 Expr: $3.(Expr),
-                                PosRange: $3.PositionRange(),
                         }
                         yylex.(*parser).generatedParserResult = ce
                         }
@@ -734,9 +732,8 @@ series_item     : BLANK
                         }
                 ;
 
-series_value    : 
-                COMMENT { fmt.Println("auxillary") }
-                | IDENTIFIER
+series_value    :
+                IDENTIFIER
                         {
                         if $1.Val != "stale" {
                                 yylex.(*parser).unexpected("series values", "number or \"stale\"")

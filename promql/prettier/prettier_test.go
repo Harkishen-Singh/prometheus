@@ -161,6 +161,26 @@ var exprs = []prettierTest{
   second
 `,
 	},
+	{
+		expr: `# head 1
+    # head 2
+    first{foo="bar", a="b"} # comment 1
+    # comment 2
+    > bool second{foo="bar", c="d"}
+`, expected: `  # head 1
+  # head 2
+  first{
+    a="b",
+    foo="bar",
+  } # comment 1
+  # comment 2
+> bool
+  second{
+    c="d",
+    foo="bar",
+  }
+`,
+	},
 }
 
 func TestPrettify(t *testing.T) {

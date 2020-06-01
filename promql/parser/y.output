@@ -43,7 +43,7 @@ state 2
 	TOPK  shift 28
 	BY  shift 13
 	OFFSET  shift 23
-	.  reduce 126 (src line 663)
+	.  reduce 126 (src line 661)
 
 	metric_identifier  goto 9
 	label_set  goto 10
@@ -72,7 +72,7 @@ state 3
 	TOPK  shift 28
 	BY  shift 13
 	OFFSET  shift 23
-	.  reduce 126 (src line 663)
+	.  reduce 126 (src line 661)
 
 	metric_identifier  goto 9
 	label_set  goto 10
@@ -163,19 +163,19 @@ state 5
 state 6
 	start:  error.    (10)
 
-	.  reduce 10 (src line 196)
+	.  reduce 10 (src line 194)
 
 
 state 7
 	start:  start EOF.    (9)
 
-	.  reduce 9 (src line 195)
+	.  reduce 9 (src line 193)
 
 
 state 8
 	start:  START_METRIC metric.    (1)
 
-	.  reduce 1 (src line 165)
+	.  reduce 1 (src line 164)
 
 
 state 9
@@ -183,122 +183,122 @@ state 9
 	label_set: .    (126)
 
 	LEFT_BRACE  shift 29
-	.  reduce 126 (src line 663)
+	.  reduce 126 (src line 661)
 
 	label_set  goto 70
 
 state 10
 	metric:  label_set.    (104)
 
-	.  reduce 104 (src line 650)
+	.  reduce 104 (src line 648)
 
 
 state 11
 	metric_identifier:  AVG.    (105)
 
-	.  reduce 105 (src line 655)
+	.  reduce 105 (src line 653)
 
 
 state 12
 	metric_identifier:  BOTTOMK.    (106)
 
-	.  reduce 106 (src line 655)
+	.  reduce 106 (src line 653)
 
 
 state 13
 	metric_identifier:  BY.    (107)
 
-	.  reduce 107 (src line 655)
+	.  reduce 107 (src line 653)
 
 
 state 14
 	metric_identifier:  COUNT.    (108)
 
-	.  reduce 108 (src line 655)
+	.  reduce 108 (src line 653)
 
 
 state 15
 	metric_identifier:  COUNT_VALUES.    (109)
 
-	.  reduce 109 (src line 655)
+	.  reduce 109 (src line 653)
 
 
 state 16
 	metric_identifier:  IDENTIFIER.    (110)
 
-	.  reduce 110 (src line 655)
+	.  reduce 110 (src line 653)
 
 
 state 17
 	metric_identifier:  LAND.    (111)
 
-	.  reduce 111 (src line 655)
+	.  reduce 111 (src line 653)
 
 
 state 18
 	metric_identifier:  LOR.    (112)
 
-	.  reduce 112 (src line 655)
+	.  reduce 112 (src line 653)
 
 
 state 19
 	metric_identifier:  LUNLESS.    (113)
 
-	.  reduce 113 (src line 655)
+	.  reduce 113 (src line 653)
 
 
 state 20
 	metric_identifier:  MAX.    (114)
 
-	.  reduce 114 (src line 655)
+	.  reduce 114 (src line 653)
 
 
 state 21
 	metric_identifier:  METRIC_IDENTIFIER.    (115)
 
-	.  reduce 115 (src line 655)
+	.  reduce 115 (src line 653)
 
 
 state 22
 	metric_identifier:  MIN.    (116)
 
-	.  reduce 116 (src line 655)
+	.  reduce 116 (src line 653)
 
 
 state 23
 	metric_identifier:  OFFSET.    (117)
 
-	.  reduce 117 (src line 655)
+	.  reduce 117 (src line 653)
 
 
 state 24
 	metric_identifier:  QUANTILE.    (118)
 
-	.  reduce 118 (src line 655)
+	.  reduce 118 (src line 653)
 
 
 state 25
 	metric_identifier:  STDDEV.    (119)
 
-	.  reduce 119 (src line 655)
+	.  reduce 119 (src line 653)
 
 
 state 26
 	metric_identifier:  STDVAR.    (120)
 
-	.  reduce 120 (src line 655)
+	.  reduce 120 (src line 653)
 
 
 state 27
 	metric_identifier:  SUM.    (121)
 
-	.  reduce 121 (src line 655)
+	.  reduce 121 (src line 653)
 
 
 state 28
 	metric_identifier:  TOPK.    (122)
 
-	.  reduce 122 (src line 655)
+	.  reduce 122 (src line 653)
 
 
 state 29
@@ -317,17 +317,17 @@ state 29
 state 30
 	start:  START_SERIES_DESCRIPTION series_description.    (2)
 
-	.  reduce 2 (src line 168)
+	.  reduce 2 (src line 167)
 
 
 state 31
 	series_description:  metric.series_values 
 	series_values: .    (135)
 
-	$end  reduce 135 (src line 699)
+	$end  reduce 135 (src line 697)
 	error  shift 77
-	EOF  reduce 135 (src line 699)
-	SPACE  reduce 135 (src line 699)
+	EOF  reduce 135 (src line 697)
+	SPACE  reduce 135 (src line 697)
 	.  error
 
 	series_values  goto 76
@@ -360,7 +360,7 @@ state 32
 	TOPK  shift 65
 	BY  shift 13
 	OFFSET  shift 23
-	.  reduce 3 (src line 169)
+	.  reduce 3 (src line 168)
 
 	aggregate_op  goto 47
 	metric_identifier  goto 53
@@ -382,7 +382,7 @@ state 32
 state 33
 	start:  START_EXPRESSION EOF.    (5)
 
-	.  reduce 5 (src line 187)
+	.  reduce 5 (src line 185)
 
 
 34: shift/reduce conflict (shift 79(0), red'n 33(0)) on EOF
@@ -393,7 +393,7 @@ state 34
 
 	COMMENT  shift 81
 	EOF  shift 79
-	.  reduce 33 (src line 291)
+	.  reduce 33 (src line 289)
 
 	comment_expr  goto 80
 
@@ -440,7 +440,7 @@ state 35
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 7 (src line 191)
+	.  reduce 7 (src line 189)
 
 
 36: shift/reduce conflict (shift 81(0), red'n 11(0)) on COMMENT
@@ -449,7 +449,7 @@ state 36
 	expr:  aggregate_expr.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 11 (src line 200)
+	.  reduce 11 (src line 198)
 
 	comment_expr  goto 99
 
@@ -459,7 +459,7 @@ state 37
 	expr:  binary_expr.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 13 (src line 209)
+	.  reduce 13 (src line 207)
 
 	comment_expr  goto 100
 
@@ -469,7 +469,7 @@ state 38
 	expr:  function_call.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 15 (src line 217)
+	.  reduce 15 (src line 215)
 
 	comment_expr  goto 101
 
@@ -479,7 +479,7 @@ state 39
 	expr:  matrix_selector.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 17 (src line 225)
+	.  reduce 17 (src line 223)
 
 	comment_expr  goto 102
 
@@ -489,7 +489,7 @@ state 40
 	expr:  number_literal.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 19 (src line 233)
+	.  reduce 19 (src line 231)
 
 	comment_expr  goto 103
 
@@ -499,7 +499,7 @@ state 41
 	expr:  offset_expr.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 21 (src line 241)
+	.  reduce 21 (src line 239)
 
 	comment_expr  goto 104
 
@@ -509,7 +509,7 @@ state 42
 	expr:  paren_expr.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 23 (src line 249)
+	.  reduce 23 (src line 247)
 
 	comment_expr  goto 105
 
@@ -519,7 +519,7 @@ state 43
 	expr:  string_literal.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 25 (src line 257)
+	.  reduce 25 (src line 255)
 
 	comment_expr  goto 106
 
@@ -529,7 +529,7 @@ state 44
 	expr:  subquery_expr.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 27 (src line 265)
+	.  reduce 27 (src line 263)
 
 	comment_expr  goto 107
 
@@ -539,7 +539,7 @@ state 45
 	expr:  unary_expr.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 29 (src line 273)
+	.  reduce 29 (src line 271)
 
 	comment_expr  goto 108
 
@@ -549,7 +549,7 @@ state 46
 	expr:  vector_selector.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 31 (src line 281)
+	.  reduce 31 (src line 279)
 
 	comment_expr  goto 109
 
@@ -573,14 +573,14 @@ state 48
 	metric_identifier:  IDENTIFIER.    (110)
 
 	LEFT_PAREN  shift 115
-	.  reduce 110 (src line 655)
+	.  reduce 110 (src line 653)
 
 	function_call_body  goto 116
 
 state 49
-	number_literal:  NUMBER.    (188)
+	number_literal:  NUMBER.    (187)
 
-	.  reduce 188 (src line 770)
+	.  reduce 187 (src line 767)
 
 
 state 50
@@ -630,9 +630,9 @@ state 50
 	vector_selector  goto 46
 
 state 51
-	string_literal:  STRING.    (194)
+	string_literal:  STRING.    (193)
 
-	.  reduce 194 (src line 806)
+	.  reduce 193 (src line 803)
 
 
 state 52
@@ -686,147 +686,147 @@ state 53
 	vector_selector:  metric_identifier.    (91)
 
 	LEFT_BRACE  shift 68
-	.  reduce 91 (src line 579)
+	.  reduce 91 (src line 577)
 
 	label_matchers  goto 119
 
 state 54
 	vector_selector:  label_matchers.    (92)
 
-	.  reduce 92 (src line 589)
+	.  reduce 92 (src line 587)
 
 
 state 55
 	metric_identifier:  AVG.    (105)
-	aggregate_op:  AVG.    (148)
+	aggregate_op:  AVG.    (147)
 
-	error  reduce 148 (src line 757)
-	LEFT_PAREN  reduce 148 (src line 757)
-	BY  reduce 148 (src line 757)
-	WITHOUT  reduce 148 (src line 757)
-	.  reduce 105 (src line 655)
+	error  reduce 147 (src line 754)
+	LEFT_PAREN  reduce 147 (src line 754)
+	BY  reduce 147 (src line 754)
+	WITHOUT  reduce 147 (src line 754)
+	.  reduce 105 (src line 653)
 
 
 state 56
 	metric_identifier:  BOTTOMK.    (106)
-	aggregate_op:  BOTTOMK.    (149)
+	aggregate_op:  BOTTOMK.    (148)
 
-	error  reduce 149 (src line 757)
-	LEFT_PAREN  reduce 149 (src line 757)
-	BY  reduce 149 (src line 757)
-	WITHOUT  reduce 149 (src line 757)
-	.  reduce 106 (src line 655)
+	error  reduce 148 (src line 754)
+	LEFT_PAREN  reduce 148 (src line 754)
+	BY  reduce 148 (src line 754)
+	WITHOUT  reduce 148 (src line 754)
+	.  reduce 106 (src line 653)
 
 
 state 57
 	metric_identifier:  COUNT.    (108)
-	aggregate_op:  COUNT.    (150)
+	aggregate_op:  COUNT.    (149)
 
-	error  reduce 150 (src line 757)
-	LEFT_PAREN  reduce 150 (src line 757)
-	BY  reduce 150 (src line 757)
-	WITHOUT  reduce 150 (src line 757)
-	.  reduce 108 (src line 655)
+	error  reduce 149 (src line 754)
+	LEFT_PAREN  reduce 149 (src line 754)
+	BY  reduce 149 (src line 754)
+	WITHOUT  reduce 149 (src line 754)
+	.  reduce 108 (src line 653)
 
 
 state 58
 	metric_identifier:  COUNT_VALUES.    (109)
-	aggregate_op:  COUNT_VALUES.    (151)
+	aggregate_op:  COUNT_VALUES.    (150)
 
-	error  reduce 151 (src line 757)
-	LEFT_PAREN  reduce 151 (src line 757)
-	BY  reduce 151 (src line 757)
-	WITHOUT  reduce 151 (src line 757)
-	.  reduce 109 (src line 655)
+	error  reduce 150 (src line 754)
+	LEFT_PAREN  reduce 150 (src line 754)
+	BY  reduce 150 (src line 754)
+	WITHOUT  reduce 150 (src line 754)
+	.  reduce 109 (src line 653)
 
 
 state 59
 	metric_identifier:  MAX.    (114)
-	aggregate_op:  MAX.    (152)
+	aggregate_op:  MAX.    (151)
 
-	error  reduce 152 (src line 757)
-	LEFT_PAREN  reduce 152 (src line 757)
-	BY  reduce 152 (src line 757)
-	WITHOUT  reduce 152 (src line 757)
-	.  reduce 114 (src line 655)
+	error  reduce 151 (src line 754)
+	LEFT_PAREN  reduce 151 (src line 754)
+	BY  reduce 151 (src line 754)
+	WITHOUT  reduce 151 (src line 754)
+	.  reduce 114 (src line 653)
 
 
 state 60
 	metric_identifier:  MIN.    (116)
-	aggregate_op:  MIN.    (153)
+	aggregate_op:  MIN.    (152)
 
-	error  reduce 153 (src line 757)
-	LEFT_PAREN  reduce 153 (src line 757)
-	BY  reduce 153 (src line 757)
-	WITHOUT  reduce 153 (src line 757)
-	.  reduce 116 (src line 655)
+	error  reduce 152 (src line 754)
+	LEFT_PAREN  reduce 152 (src line 754)
+	BY  reduce 152 (src line 754)
+	WITHOUT  reduce 152 (src line 754)
+	.  reduce 116 (src line 653)
 
 
 state 61
 	metric_identifier:  QUANTILE.    (118)
-	aggregate_op:  QUANTILE.    (154)
+	aggregate_op:  QUANTILE.    (153)
 
-	error  reduce 154 (src line 757)
-	LEFT_PAREN  reduce 154 (src line 757)
-	BY  reduce 154 (src line 757)
-	WITHOUT  reduce 154 (src line 757)
-	.  reduce 118 (src line 655)
+	error  reduce 153 (src line 754)
+	LEFT_PAREN  reduce 153 (src line 754)
+	BY  reduce 153 (src line 754)
+	WITHOUT  reduce 153 (src line 754)
+	.  reduce 118 (src line 653)
 
 
 state 62
 	metric_identifier:  STDDEV.    (119)
-	aggregate_op:  STDDEV.    (155)
+	aggregate_op:  STDDEV.    (154)
 
-	error  reduce 155 (src line 757)
-	LEFT_PAREN  reduce 155 (src line 757)
-	BY  reduce 155 (src line 757)
-	WITHOUT  reduce 155 (src line 757)
-	.  reduce 119 (src line 655)
+	error  reduce 154 (src line 754)
+	LEFT_PAREN  reduce 154 (src line 754)
+	BY  reduce 154 (src line 754)
+	WITHOUT  reduce 154 (src line 754)
+	.  reduce 119 (src line 653)
 
 
 state 63
 	metric_identifier:  STDVAR.    (120)
-	aggregate_op:  STDVAR.    (156)
+	aggregate_op:  STDVAR.    (155)
 
-	error  reduce 156 (src line 757)
-	LEFT_PAREN  reduce 156 (src line 757)
-	BY  reduce 156 (src line 757)
-	WITHOUT  reduce 156 (src line 757)
-	.  reduce 120 (src line 655)
+	error  reduce 155 (src line 754)
+	LEFT_PAREN  reduce 155 (src line 754)
+	BY  reduce 155 (src line 754)
+	WITHOUT  reduce 155 (src line 754)
+	.  reduce 120 (src line 653)
 
 
 state 64
 	metric_identifier:  SUM.    (121)
-	aggregate_op:  SUM.    (157)
+	aggregate_op:  SUM.    (156)
 
-	error  reduce 157 (src line 757)
-	LEFT_PAREN  reduce 157 (src line 757)
-	BY  reduce 157 (src line 757)
-	WITHOUT  reduce 157 (src line 757)
-	.  reduce 121 (src line 655)
+	error  reduce 156 (src line 754)
+	LEFT_PAREN  reduce 156 (src line 754)
+	BY  reduce 156 (src line 754)
+	WITHOUT  reduce 156 (src line 754)
+	.  reduce 121 (src line 653)
 
 
 state 65
 	metric_identifier:  TOPK.    (122)
-	aggregate_op:  TOPK.    (158)
+	aggregate_op:  TOPK.    (157)
 
-	error  reduce 158 (src line 757)
-	LEFT_PAREN  reduce 158 (src line 757)
-	BY  reduce 158 (src line 757)
-	WITHOUT  reduce 158 (src line 757)
-	.  reduce 122 (src line 655)
+	error  reduce 157 (src line 754)
+	LEFT_PAREN  reduce 157 (src line 754)
+	BY  reduce 157 (src line 754)
+	WITHOUT  reduce 157 (src line 754)
+	.  reduce 122 (src line 653)
 
 
 state 66
-	unary_op:  ADD.    (182)
+	unary_op:  ADD.    (181)
 
-	.  reduce 182 (src line 762)
+	.  reduce 181 (src line 759)
 
 
 state 67
-	unary_op:  SUB.    (183)
+	unary_op:  SUB.    (182)
 
-	.  reduce 183 (src line 762)
+	.  reduce 182 (src line 759)
 
 
 state 68
@@ -845,13 +845,13 @@ state 68
 state 69
 	start:  START_METRIC_SELECTOR vector_selector.    (8)
 
-	.  reduce 8 (src line 193)
+	.  reduce 8 (src line 191)
 
 
 state 70
 	metric:  metric_identifier label_set.    (103)
 
-	.  reduce 103 (src line 648)
+	.  reduce 103 (src line 646)
 
 
 state 71
@@ -869,13 +869,13 @@ state 71
 state 72
 	label_set:  LEFT_BRACE RIGHT_BRACE.    (125)
 
-	.  reduce 125 (src line 661)
+	.  reduce 125 (src line 659)
 
 
 state 73
 	label_set_list:  label_set_item.    (128)
 
-	.  reduce 128 (src line 669)
+	.  reduce 128 (src line 667)
 
 
 state 74
@@ -891,7 +891,7 @@ state 74
 state 75
 	label_set_item:  error.    (133)
 
-	.  reduce 133 (src line 682)
+	.  reduce 133 (src line 680)
 
 
 state 76
@@ -900,13 +900,13 @@ state 76
 	series_values:  series_values.SPACE 
 
 	SPACE  shift 130
-	.  reduce 134 (src line 690)
+	.  reduce 134 (src line 688)
 
 
 state 77
 	series_values:  error.    (138)
 
-	.  reduce 138 (src line 705)
+	.  reduce 138 (src line 703)
 
 
 state 78
@@ -952,19 +952,19 @@ state 78
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 4 (src line 177)
+	.  reduce 4 (src line 176)
 
 
 state 79
 	start:  START_EXPRESSION COMMENT EOF.    (6)
 
-	.  reduce 6 (src line 189)
+	.  reduce 6 (src line 187)
 
 
 state 80
 	comment_expr:  COMMENT comment_expr.    (34)
 
-	.  reduce 34 (src line 299)
+	.  reduce 34 (src line 297)
 
 
 81: shift/reduce conflict (shift 81(0), red'n 33(0)) on COMMENT
@@ -973,7 +973,7 @@ state 81
 	comment_expr:  COMMENT.comment_expr 
 
 	COMMENT  shift 81
-	.  reduce 33 (src line 291)
+	.  reduce 33 (src line 289)
 
 	comment_expr  goto 80
 
@@ -982,7 +982,7 @@ state 82
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 131
 	bool_modifier  goto 133
@@ -994,7 +994,7 @@ state 83
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 136
 	bool_modifier  goto 133
@@ -1006,7 +1006,7 @@ state 84
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 137
 	bool_modifier  goto 133
@@ -1018,7 +1018,7 @@ state 85
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 138
 	bool_modifier  goto 133
@@ -1030,7 +1030,7 @@ state 86
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 139
 	bool_modifier  goto 133
@@ -1042,7 +1042,7 @@ state 87
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 140
 	bool_modifier  goto 133
@@ -1054,7 +1054,7 @@ state 88
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 141
 	bool_modifier  goto 133
@@ -1066,7 +1066,7 @@ state 89
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 142
 	bool_modifier  goto 133
@@ -1078,7 +1078,7 @@ state 90
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 143
 	bool_modifier  goto 133
@@ -1090,7 +1090,7 @@ state 91
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 144
 	bool_modifier  goto 133
@@ -1102,7 +1102,7 @@ state 92
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 145
 	bool_modifier  goto 133
@@ -1114,7 +1114,7 @@ state 93
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 146
 	bool_modifier  goto 133
@@ -1126,7 +1126,7 @@ state 94
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 147
 	bool_modifier  goto 133
@@ -1138,7 +1138,7 @@ state 95
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 148
 	bool_modifier  goto 133
@@ -1150,7 +1150,7 @@ state 96
 	bool_modifier: .    (57)
 
 	BOOL  shift 135
-	.  reduce 57 (src line 367)
+	.  reduce 57 (src line 365)
 
 	bin_modifier  goto 149
 	bool_modifier  goto 133
@@ -1184,67 +1184,67 @@ state 98
 state 99
 	expr:  aggregate_expr comment_expr.    (12)
 
-	.  reduce 12 (src line 202)
+	.  reduce 12 (src line 200)
 
 
 state 100
 	expr:  binary_expr comment_expr.    (14)
 
-	.  reduce 14 (src line 210)
+	.  reduce 14 (src line 208)
 
 
 state 101
 	expr:  function_call comment_expr.    (16)
 
-	.  reduce 16 (src line 218)
+	.  reduce 16 (src line 216)
 
 
 state 102
 	expr:  matrix_selector comment_expr.    (18)
 
-	.  reduce 18 (src line 226)
+	.  reduce 18 (src line 224)
 
 
 state 103
 	expr:  number_literal comment_expr.    (20)
 
-	.  reduce 20 (src line 234)
+	.  reduce 20 (src line 232)
 
 
 state 104
 	expr:  offset_expr comment_expr.    (22)
 
-	.  reduce 22 (src line 242)
+	.  reduce 22 (src line 240)
 
 
 state 105
 	expr:  paren_expr comment_expr.    (24)
 
-	.  reduce 24 (src line 250)
+	.  reduce 24 (src line 248)
 
 
 state 106
 	expr:  string_literal comment_expr.    (26)
 
-	.  reduce 26 (src line 258)
+	.  reduce 26 (src line 256)
 
 
 state 107
 	expr:  subquery_expr comment_expr.    (28)
 
-	.  reduce 28 (src line 266)
+	.  reduce 28 (src line 264)
 
 
 state 108
 	expr:  unary_expr comment_expr.    (30)
 
-	.  reduce 30 (src line 274)
+	.  reduce 30 (src line 272)
 
 
 state 109
 	expr:  vector_selector comment_expr.    (32)
 
-	.  reduce 32 (src line 282)
+	.  reduce 32 (src line 280)
 
 
 state 110
@@ -1261,14 +1261,14 @@ state 111
 
 	BY  shift 113
 	WITHOUT  shift 114
-	.  reduce 37 (src line 316)
+	.  reduce 37 (src line 314)
 
 	aggregate_modifier  goto 156
 
 state 112
 	aggregate_expr:  aggregate_op error.    (38)
 
-	.  reduce 38 (src line 318)
+	.  reduce 38 (src line 316)
 
 
 state 113
@@ -1341,7 +1341,7 @@ state 115
 state 116
 	function_call:  IDENTIFIER function_call_body.    (74)
 
-	.  reduce 74 (src line 445)
+	.  reduce 74 (src line 443)
 
 
 state 117
@@ -1420,13 +1420,13 @@ state 118
 	LEFT_BRACKET  shift 98
 	POW  shift 95
 	OFFSET  shift 97
-	.  reduce 89 (src line 551)
+	.  reduce 89 (src line 549)
 
 
 state 119
 	vector_selector:  metric_identifier label_matchers.    (90)
 
-	.  reduce 90 (src line 571)
+	.  reduce 90 (src line 569)
 
 
 state 120
@@ -1444,13 +1444,13 @@ state 120
 state 121
 	label_matchers:  LEFT_BRACE RIGHT_BRACE.    (95)
 
-	.  reduce 95 (src line 611)
+	.  reduce 95 (src line 609)
 
 
 state 122
 	label_match_list:  label_matcher.    (97)
 
-	.  reduce 97 (src line 628)
+	.  reduce 97 (src line 626)
 
 
 state 123
@@ -1470,13 +1470,13 @@ state 123
 state 124
 	label_matcher:  error.    (102)
 
-	.  reduce 102 (src line 640)
+	.  reduce 102 (src line 638)
 
 
 state 125
 	label_set:  LEFT_BRACE label_set_list RIGHT_BRACE.    (123)
 
-	.  reduce 123 (src line 657)
+	.  reduce 123 (src line 655)
 
 
 state 126
@@ -1493,7 +1493,7 @@ state 126
 state 127
 	label_set_list:  label_set_list error.    (129)
 
-	.  reduce 129 (src line 671)
+	.  reduce 129 (src line 669)
 
 
 state 128
@@ -1508,7 +1508,7 @@ state 128
 state 129
 	label_set_item:  IDENTIFIER error.    (132)
 
-	.  reduce 132 (src line 680)
+	.  reduce 132 (src line 678)
 
 
 state 130
@@ -1516,17 +1516,16 @@ state 130
 	series_values:  series_values SPACE.    (137)
 
 	BLANK  shift 179
-	COMMENT  shift 181
-	IDENTIFIER  shift 182
-	NUMBER  shift 185
-	ADD  shift 186
-	SUB  shift 187
-	.  reduce 137 (src line 703)
+	IDENTIFIER  shift 181
+	NUMBER  shift 184
+	ADD  shift 185
+	SUB  shift 186
+	.  reduce 137 (src line 701)
 
 	series_item  goto 178
-	number  goto 183
+	number  goto 182
 	series_value  goto 180
-	signed_number  goto 184
+	signed_number  goto 183
 
 state 131
 	binary_expr:  expr ADD bin_modifier.expr 
@@ -1562,7 +1561,7 @@ state 131
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 188
+	expr  goto 187
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1577,7 +1576,7 @@ state 131
 state 132
 	bin_modifier:  group_modifiers.    (56)
 
-	.  reduce 56 (src line 365)
+	.  reduce 56 (src line 363)
 
 
 state 133
@@ -1585,9 +1584,9 @@ state 133
 	on_or_ignoring:  bool_modifier.ON grouping_labels 
 	group_modifiers:  bool_modifier.    (61)
 
-	IGNORING  shift 189
-	ON  shift 190
-	.  reduce 61 (src line 393)
+	IGNORING  shift 188
+	ON  shift 189
+	.  reduce 61 (src line 391)
 
 
 state 134
@@ -1595,15 +1594,15 @@ state 134
 	group_modifiers:  on_or_ignoring.GROUP_LEFT maybe_grouping_labels 
 	group_modifiers:  on_or_ignoring.GROUP_RIGHT maybe_grouping_labels 
 
-	GROUP_LEFT  shift 191
-	GROUP_RIGHT  shift 192
-	.  reduce 62 (src line 394)
+	GROUP_LEFT  shift 190
+	GROUP_RIGHT  shift 191
+	.  reduce 62 (src line 392)
 
 
 state 135
 	bool_modifier:  BOOL.    (58)
 
-	.  reduce 58 (src line 372)
+	.  reduce 58 (src line 370)
 
 
 state 136
@@ -1640,7 +1639,7 @@ state 136
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 193
+	expr  goto 192
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1686,7 +1685,7 @@ state 137
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 194
+	expr  goto 193
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1732,7 +1731,7 @@ state 138
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 195
+	expr  goto 194
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1778,7 +1777,7 @@ state 139
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 196
+	expr  goto 195
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1824,7 +1823,7 @@ state 140
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 197
+	expr  goto 196
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1870,7 +1869,7 @@ state 141
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 198
+	expr  goto 197
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1916,7 +1915,7 @@ state 142
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 199
+	expr  goto 198
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -1962,7 +1961,7 @@ state 143
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 200
+	expr  goto 199
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -2008,7 +2007,7 @@ state 144
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 201
+	expr  goto 200
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -2054,7 +2053,7 @@ state 145
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 202
+	expr  goto 201
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -2100,7 +2099,7 @@ state 146
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 203
+	expr  goto 202
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -2146,7 +2145,7 @@ state 147
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 204
+	expr  goto 203
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -2192,7 +2191,7 @@ state 148
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 205
+	expr  goto 204
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -2238,7 +2237,7 @@ state 149
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 206
+	expr  goto 205
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -2253,19 +2252,19 @@ state 149
 state 150
 	offset_expr:  expr OFFSET duration.    (81)
 
-	.  reduce 81 (src line 491)
+	.  reduce 81 (src line 489)
 
 
 state 151
 	offset_expr:  expr OFFSET error.    (82)
 
-	.  reduce 82 (src line 496)
+	.  reduce 82 (src line 494)
 
 
 state 152
-	duration:  DURATION.    (193)
+	duration:  DURATION.    (192)
 
-	.  reduce 193 (src line 795)
+	.  reduce 192 (src line 792)
 
 
 state 153
@@ -2275,34 +2274,34 @@ state 153
 	subquery_expr:  expr LEFT_BRACKET duration.COLON error 
 	subquery_expr:  expr LEFT_BRACKET duration.error 
 
-	error  shift 209
-	COLON  shift 208
-	RIGHT_BRACKET  shift 207
+	error  shift 208
+	COLON  shift 207
+	RIGHT_BRACKET  shift 206
 	.  error
 
 
 state 154
 	subquery_expr:  expr LEFT_BRACKET error.    (88)
 
-	.  reduce 88 (src line 543)
+	.  reduce 88 (src line 541)
 
 
 state 155
 	aggregate_expr:  aggregate_op aggregate_modifier function_call_body.    (35)
 
-	.  reduce 35 (src line 312)
+	.  reduce 35 (src line 310)
 
 
 state 156
 	aggregate_expr:  aggregate_op function_call_body aggregate_modifier.    (36)
 
-	.  reduce 36 (src line 314)
+	.  reduce 36 (src line 312)
 
 
 state 157
 	aggregate_modifier:  BY grouping_labels.    (39)
 
-	.  reduce 39 (src line 325)
+	.  reduce 39 (src line 323)
 
 
 state 158
@@ -2310,47 +2309,47 @@ state 158
 	grouping_labels:  LEFT_PAREN.grouping_label_list COMMA RIGHT_PAREN 
 	grouping_labels:  LEFT_PAREN.RIGHT_PAREN 
 
-	error  shift 214
-	IDENTIFIER  shift 223
-	METRIC_IDENTIFIER  shift 229
-	RIGHT_PAREN  shift 211
-	LAND  shift 225
-	LOR  shift 226
-	LUNLESS  shift 227
-	AVG  shift 215
-	BOTTOMK  shift 217
-	COUNT  shift 219
-	COUNT_VALUES  shift 220
-	MAX  shift 228
-	MIN  shift 230
-	QUANTILE  shift 233
-	STDDEV  shift 234
-	STDVAR  shift 235
-	SUM  shift 236
-	TOPK  shift 237
-	BOOL  shift 216
-	BY  shift 218
-	GROUP_LEFT  shift 221
-	GROUP_RIGHT  shift 222
-	IGNORING  shift 224
-	OFFSET  shift 231
-	ON  shift 232
+	error  shift 213
+	IDENTIFIER  shift 222
+	METRIC_IDENTIFIER  shift 228
+	RIGHT_PAREN  shift 210
+	LAND  shift 224
+	LOR  shift 225
+	LUNLESS  shift 226
+	AVG  shift 214
+	BOTTOMK  shift 216
+	COUNT  shift 218
+	COUNT_VALUES  shift 219
+	MAX  shift 227
+	MIN  shift 229
+	QUANTILE  shift 232
+	STDDEV  shift 233
+	STDVAR  shift 234
+	SUM  shift 235
+	TOPK  shift 236
+	BOOL  shift 215
+	BY  shift 217
+	GROUP_LEFT  shift 220
+	GROUP_RIGHT  shift 221
+	IGNORING  shift 223
+	OFFSET  shift 230
+	ON  shift 231
 	.  error
 
-	grouping_label  goto 212
-	maybe_label  goto 213
-	grouping_label_list  goto 210
+	grouping_label  goto 211
+	maybe_label  goto 212
+	grouping_label_list  goto 209
 
 state 159
 	grouping_labels:  error.    (68)
 
-	.  reduce 68 (src line 416)
+	.  reduce 68 (src line 414)
 
 
 state 160
 	aggregate_modifier:  WITHOUT grouping_labels.    (40)
 
-	.  reduce 40 (src line 332)
+	.  reduce 40 (src line 330)
 
 
 state 161
@@ -2358,15 +2357,15 @@ state 161
 	function_call_args:  function_call_args.COMMA expr 
 	function_call_args:  function_call_args.COMMA 
 
-	COMMA  shift 239
-	RIGHT_PAREN  shift 238
+	COMMA  shift 238
+	RIGHT_PAREN  shift 237
 	.  error
 
 
 state 162
 	function_call_body:  LEFT_PAREN RIGHT_PAREN.    (76)
 
-	.  reduce 76 (src line 464)
+	.  reduce 76 (src line 462)
 
 
 state 163
@@ -2412,19 +2411,19 @@ state 163
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 78 (src line 470)
+	.  reduce 78 (src line 468)
 
 
 state 164
 	paren_expr:  LEFT_PAREN expr RIGHT_PAREN.    (80)
 
-	.  reduce 80 (src line 483)
+	.  reduce 80 (src line 481)
 
 
 state 165
 	label_matchers:  LEFT_BRACE label_match_list RIGHT_BRACE.    (93)
 
-	.  reduce 93 (src line 597)
+	.  reduce 93 (src line 595)
 
 
 state 166
@@ -2433,92 +2432,92 @@ state 166
 
 	error  shift 124
 	IDENTIFIER  shift 123
-	RIGHT_BRACE  shift 240
+	RIGHT_BRACE  shift 239
 	.  error
 
-	label_matcher  goto 241
+	label_matcher  goto 240
 
 state 167
 	label_match_list:  label_match_list error.    (98)
 
-	.  reduce 98 (src line 630)
+	.  reduce 98 (src line 628)
 
 
 state 168
 	label_matcher:  IDENTIFIER match_op.STRING 
 	label_matcher:  IDENTIFIER match_op.error 
 
-	error  shift 243
-	STRING  shift 242
+	error  shift 242
+	STRING  shift 241
 	.  error
 
 
 state 169
 	label_matcher:  IDENTIFIER error.    (101)
 
-	.  reduce 101 (src line 638)
+	.  reduce 101 (src line 636)
 
 
 state 170
-	match_op:  EQL.    (184)
+	match_op:  EQL.    (183)
 
-	.  reduce 184 (src line 764)
+	.  reduce 183 (src line 761)
 
 
 state 171
-	match_op:  NEQ.    (185)
+	match_op:  NEQ.    (184)
 
-	.  reduce 185 (src line 764)
+	.  reduce 184 (src line 761)
 
 
 state 172
-	match_op:  EQL_REGEX.    (186)
+	match_op:  EQL_REGEX.    (185)
 
-	.  reduce 186 (src line 764)
+	.  reduce 185 (src line 761)
 
 
 state 173
-	match_op:  NEQ_REGEX.    (187)
+	match_op:  NEQ_REGEX.    (186)
 
-	.  reduce 187 (src line 764)
+	.  reduce 186 (src line 761)
 
 
 state 174
 	label_set:  LEFT_BRACE label_set_list COMMA RIGHT_BRACE.    (124)
 
-	.  reduce 124 (src line 659)
+	.  reduce 124 (src line 657)
 
 
 state 175
 	label_set_list:  label_set_list COMMA label_set_item.    (127)
 
-	.  reduce 127 (src line 667)
+	.  reduce 127 (src line 665)
 
 
 state 176
 	label_set_item:  IDENTIFIER EQL STRING.    (130)
 
-	.  reduce 130 (src line 676)
+	.  reduce 130 (src line 674)
 
 
 state 177
 	label_set_item:  IDENTIFIER EQL error.    (131)
 
-	.  reduce 131 (src line 678)
+	.  reduce 131 (src line 676)
 
 
 state 178
 	series_values:  series_values SPACE series_item.    (136)
 
-	.  reduce 136 (src line 701)
+	.  reduce 136 (src line 699)
 
 
 state 179
 	series_item:  BLANK.    (139)
 	series_item:  BLANK.TIMES uint 
 
-	TIMES  shift 244
-	.  reduce 139 (src line 709)
+	TIMES  shift 243
+	.  reduce 139 (src line 707)
 
 
 state 180
@@ -2526,60 +2525,54 @@ state 180
 	series_item:  series_value.TIMES uint 
 	series_item:  series_value.signed_number TIMES uint 
 
-	TIMES  shift 245
-	ADD  shift 186
-	SUB  shift 187
-	.  reduce 141 (src line 718)
+	TIMES  shift 244
+	ADD  shift 185
+	SUB  shift 186
+	.  reduce 141 (src line 716)
 
-	signed_number  goto 246
+	signed_number  goto 245
 
 state 181
-	series_value:  COMMENT.    (144)
+	series_value:  IDENTIFIER.    (144)
 
-	.  reduce 144 (src line 737)
+	.  reduce 144 (src line 735)
 
 
 state 182
-	series_value:  IDENTIFIER.    (145)
+	series_value:  number.    (145)
 
-	.  reduce 145 (src line 739)
+	.  reduce 145 (src line 743)
 
 
 state 183
-	series_value:  number.    (146)
+	series_value:  signed_number.    (146)
 
-	.  reduce 146 (src line 746)
+	.  reduce 146 (src line 744)
 
 
 state 184
-	series_value:  signed_number.    (147)
+	number:  NUMBER.    (188)
 
-	.  reduce 147 (src line 747)
+	.  reduce 188 (src line 776)
 
 
 state 185
-	number:  NUMBER.    (189)
-
-	.  reduce 189 (src line 779)
-
-
-state 186
 	signed_number:  ADD.number 
 
-	NUMBER  shift 185
+	NUMBER  shift 184
+	.  error
+
+	number  goto 246
+
+state 186
+	signed_number:  SUB.number 
+
+	NUMBER  shift 184
 	.  error
 
 	number  goto 247
 
 state 187
-	signed_number:  SUB.number 
-
-	NUMBER  shift 185
-	.  error
-
-	number  goto 248
-
-state 188
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr ADD bin_modifier expr.    (41)
 	binary_expr:  expr.DIV bin_modifier expr 
@@ -2611,11 +2604,20 @@ state 188
 	MUL  shift 93
 	POW  shift 95
 	OFFSET  shift 97
-	.  reduce 41 (src line 346)
+	.  reduce 41 (src line 344)
 
+
+state 188
+	on_or_ignoring:  bool_modifier IGNORING.grouping_labels 
+
+	error  shift 159
+	LEFT_PAREN  shift 158
+	.  error
+
+	grouping_labels  goto 248
 
 state 189
-	on_or_ignoring:  bool_modifier IGNORING.grouping_labels 
+	on_or_ignoring:  bool_modifier ON.grouping_labels 
 
 	error  shift 159
 	LEFT_PAREN  shift 158
@@ -2623,86 +2625,77 @@ state 189
 
 	grouping_labels  goto 249
 
+190: shift/reduce conflict (shift 158(0), red'n 196(0)) on LEFT_PAREN
 state 190
-	on_or_ignoring:  bool_modifier ON.grouping_labels 
-
-	error  shift 159
-	LEFT_PAREN  shift 158
-	.  error
-
-	grouping_labels  goto 250
-
-191: shift/reduce conflict (shift 158(0), red'n 197(0)) on LEFT_PAREN
-state 191
 	group_modifiers:  on_or_ignoring GROUP_LEFT.maybe_grouping_labels 
-	maybe_grouping_labels: .    (197)
+	maybe_grouping_labels: .    (196)
 
 	error  shift 159
-	IDENTIFIER  reduce 197 (src line 824)
-	LEFT_BRACE  reduce 197 (src line 824)
+	IDENTIFIER  reduce 196 (src line 821)
+	LEFT_BRACE  reduce 196 (src line 821)
 	LEFT_PAREN  shift 158
-	METRIC_IDENTIFIER  reduce 197 (src line 824)
-	NUMBER  reduce 197 (src line 824)
-	STRING  reduce 197 (src line 824)
-	ADD  reduce 197 (src line 824)
-	LAND  reduce 197 (src line 824)
-	LOR  reduce 197 (src line 824)
-	LUNLESS  reduce 197 (src line 824)
-	SUB  reduce 197 (src line 824)
-	AVG  reduce 197 (src line 824)
-	BOTTOMK  reduce 197 (src line 824)
-	COUNT  reduce 197 (src line 824)
-	COUNT_VALUES  reduce 197 (src line 824)
-	MAX  reduce 197 (src line 824)
-	MIN  reduce 197 (src line 824)
-	QUANTILE  reduce 197 (src line 824)
-	STDDEV  reduce 197 (src line 824)
-	STDVAR  reduce 197 (src line 824)
-	SUM  reduce 197 (src line 824)
-	TOPK  reduce 197 (src line 824)
-	BY  reduce 197 (src line 824)
-	OFFSET  reduce 197 (src line 824)
+	METRIC_IDENTIFIER  reduce 196 (src line 821)
+	NUMBER  reduce 196 (src line 821)
+	STRING  reduce 196 (src line 821)
+	ADD  reduce 196 (src line 821)
+	LAND  reduce 196 (src line 821)
+	LOR  reduce 196 (src line 821)
+	LUNLESS  reduce 196 (src line 821)
+	SUB  reduce 196 (src line 821)
+	AVG  reduce 196 (src line 821)
+	BOTTOMK  reduce 196 (src line 821)
+	COUNT  reduce 196 (src line 821)
+	COUNT_VALUES  reduce 196 (src line 821)
+	MAX  reduce 196 (src line 821)
+	MIN  reduce 196 (src line 821)
+	QUANTILE  reduce 196 (src line 821)
+	STDDEV  reduce 196 (src line 821)
+	STDVAR  reduce 196 (src line 821)
+	SUM  reduce 196 (src line 821)
+	TOPK  reduce 196 (src line 821)
+	BY  reduce 196 (src line 821)
+	OFFSET  reduce 196 (src line 821)
 	.  error
 
-	grouping_labels  goto 252
-	maybe_grouping_labels  goto 251
+	grouping_labels  goto 251
+	maybe_grouping_labels  goto 250
 
-192: shift/reduce conflict (shift 158(0), red'n 197(0)) on LEFT_PAREN
-state 192
+191: shift/reduce conflict (shift 158(0), red'n 196(0)) on LEFT_PAREN
+state 191
 	group_modifiers:  on_or_ignoring GROUP_RIGHT.maybe_grouping_labels 
-	maybe_grouping_labels: .    (197)
+	maybe_grouping_labels: .    (196)
 
 	error  shift 159
-	IDENTIFIER  reduce 197 (src line 824)
-	LEFT_BRACE  reduce 197 (src line 824)
+	IDENTIFIER  reduce 196 (src line 821)
+	LEFT_BRACE  reduce 196 (src line 821)
 	LEFT_PAREN  shift 158
-	METRIC_IDENTIFIER  reduce 197 (src line 824)
-	NUMBER  reduce 197 (src line 824)
-	STRING  reduce 197 (src line 824)
-	ADD  reduce 197 (src line 824)
-	LAND  reduce 197 (src line 824)
-	LOR  reduce 197 (src line 824)
-	LUNLESS  reduce 197 (src line 824)
-	SUB  reduce 197 (src line 824)
-	AVG  reduce 197 (src line 824)
-	BOTTOMK  reduce 197 (src line 824)
-	COUNT  reduce 197 (src line 824)
-	COUNT_VALUES  reduce 197 (src line 824)
-	MAX  reduce 197 (src line 824)
-	MIN  reduce 197 (src line 824)
-	QUANTILE  reduce 197 (src line 824)
-	STDDEV  reduce 197 (src line 824)
-	STDVAR  reduce 197 (src line 824)
-	SUM  reduce 197 (src line 824)
-	TOPK  reduce 197 (src line 824)
-	BY  reduce 197 (src line 824)
-	OFFSET  reduce 197 (src line 824)
+	METRIC_IDENTIFIER  reduce 196 (src line 821)
+	NUMBER  reduce 196 (src line 821)
+	STRING  reduce 196 (src line 821)
+	ADD  reduce 196 (src line 821)
+	LAND  reduce 196 (src line 821)
+	LOR  reduce 196 (src line 821)
+	LUNLESS  reduce 196 (src line 821)
+	SUB  reduce 196 (src line 821)
+	AVG  reduce 196 (src line 821)
+	BOTTOMK  reduce 196 (src line 821)
+	COUNT  reduce 196 (src line 821)
+	COUNT_VALUES  reduce 196 (src line 821)
+	MAX  reduce 196 (src line 821)
+	MIN  reduce 196 (src line 821)
+	QUANTILE  reduce 196 (src line 821)
+	STDDEV  reduce 196 (src line 821)
+	STDVAR  reduce 196 (src line 821)
+	SUM  reduce 196 (src line 821)
+	TOPK  reduce 196 (src line 821)
+	BY  reduce 196 (src line 821)
+	OFFSET  reduce 196 (src line 821)
 	.  error
 
-	grouping_labels  goto 252
-	maybe_grouping_labels  goto 253
+	grouping_labels  goto 251
+	maybe_grouping_labels  goto 252
 
-state 193
+state 192
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr DIV bin_modifier expr.    (42)
@@ -2731,10 +2724,10 @@ state 193
 	LEFT_BRACKET  shift 98
 	POW  shift 95
 	OFFSET  shift 97
-	.  reduce 42 (src line 347)
+	.  reduce 42 (src line 345)
 
 
-state 194
+state 193
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -2768,10 +2761,10 @@ state 194
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 43 (src line 348)
+	.  reduce 43 (src line 346)
 
 
-state 195
+state 194
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -2805,10 +2798,10 @@ state 195
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 44 (src line 349)
+	.  reduce 44 (src line 347)
 
 
-state 196
+state 195
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -2842,10 +2835,10 @@ state 196
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 45 (src line 350)
+	.  reduce 45 (src line 348)
 
 
-state 197
+state 196
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -2885,10 +2878,10 @@ state 197
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 46 (src line 351)
+	.  reduce 46 (src line 349)
 
 
-state 198
+state 197
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -2930,10 +2923,10 @@ state 198
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 47 (src line 352)
+	.  reduce 47 (src line 350)
 
 
-state 199
+state 198
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -2967,10 +2960,10 @@ state 199
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 48 (src line 353)
+	.  reduce 48 (src line 351)
 
 
-state 200
+state 199
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3004,10 +2997,10 @@ state 200
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 49 (src line 354)
+	.  reduce 49 (src line 352)
 
 
-state 201
+state 200
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3047,10 +3040,10 @@ state 201
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 50 (src line 355)
+	.  reduce 50 (src line 353)
 
 
-state 202
+state 201
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3079,10 +3072,10 @@ state 202
 	LEFT_BRACKET  shift 98
 	POW  shift 95
 	OFFSET  shift 97
-	.  reduce 51 (src line 356)
+	.  reduce 51 (src line 354)
 
 
-state 203
+state 202
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3111,10 +3104,10 @@ state 203
 	LEFT_BRACKET  shift 98
 	POW  shift 95
 	OFFSET  shift 97
-	.  reduce 52 (src line 357)
+	.  reduce 52 (src line 355)
 
 
-state 204
+state 203
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3148,10 +3141,10 @@ state 204
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 53 (src line 358)
+	.  reduce 53 (src line 356)
 
 
-state 205
+state 204
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3180,10 +3173,10 @@ state 205
 	LEFT_BRACKET  shift 98
 	POW  shift 95
 	OFFSET  shift 97
-	.  reduce 54 (src line 359)
+	.  reduce 54 (src line 357)
 
 
-state 206
+state 205
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3215,216 +3208,216 @@ state 206
 	MUL  shift 93
 	POW  shift 95
 	OFFSET  shift 97
-	.  reduce 55 (src line 360)
+	.  reduce 55 (src line 358)
+
+
+state 206
+	matrix_selector:  expr LEFT_BRACKET duration RIGHT_BRACKET.    (83)
+
+	.  reduce 83 (src line 502)
 
 
 state 207
-	matrix_selector:  expr LEFT_BRACKET duration RIGHT_BRACKET.    (83)
-
-	.  reduce 83 (src line 504)
-
-
-state 208
 	subquery_expr:  expr LEFT_BRACKET duration COLON.maybe_duration RIGHT_BRACKET 
 	subquery_expr:  expr LEFT_BRACKET duration COLON.duration error 
 	subquery_expr:  expr LEFT_BRACKET duration COLON.error 
-	maybe_duration: .    (195)
+	maybe_duration: .    (194)
 
-	error  shift 256
+	error  shift 255
 	DURATION  shift 152
-	RIGHT_BRACKET  reduce 195 (src line 819)
+	RIGHT_BRACKET  reduce 194 (src line 816)
 	.  error
 
-	duration  goto 255
-	maybe_duration  goto 254
+	duration  goto 254
+	maybe_duration  goto 253
 
-state 209
+state 208
 	subquery_expr:  expr LEFT_BRACKET duration error.    (87)
 
-	.  reduce 87 (src line 541)
+	.  reduce 87 (src line 539)
 
 
-state 210
+state 209
 	grouping_labels:  LEFT_PAREN grouping_label_list.RIGHT_PAREN 
 	grouping_labels:  LEFT_PAREN grouping_label_list.COMMA RIGHT_PAREN 
 	grouping_label_list:  grouping_label_list.COMMA grouping_label 
 	grouping_label_list:  grouping_label_list.error 
 
-	error  shift 259
-	COMMA  shift 258
-	RIGHT_PAREN  shift 257
+	error  shift 258
+	COMMA  shift 257
+	RIGHT_PAREN  shift 256
 	.  error
 
 
-state 211
+state 210
 	grouping_labels:  LEFT_PAREN RIGHT_PAREN.    (67)
 
-	.  reduce 67 (src line 414)
+	.  reduce 67 (src line 412)
+
+
+state 211
+	grouping_label_list:  grouping_label.    (70)
+
+	.  reduce 70 (src line 422)
 
 
 state 212
-	grouping_label_list:  grouping_label.    (70)
+	grouping_label:  maybe_label.    (72)
 
-	.  reduce 70 (src line 424)
+	.  reduce 72 (src line 428)
 
 
 state 213
-	grouping_label:  maybe_label.    (72)
+	grouping_label:  error.    (73)
 
-	.  reduce 72 (src line 430)
+	.  reduce 73 (src line 435)
 
 
 state 214
-	grouping_label:  error.    (73)
+	maybe_label:  AVG.    (158)
 
-	.  reduce 73 (src line 437)
+	.  reduce 158 (src line 757)
 
 
 state 215
-	maybe_label:  AVG.    (159)
+	maybe_label:  BOOL.    (159)
 
-	.  reduce 159 (src line 760)
+	.  reduce 159 (src line 757)
 
 
 state 216
-	maybe_label:  BOOL.    (160)
+	maybe_label:  BOTTOMK.    (160)
 
-	.  reduce 160 (src line 760)
+	.  reduce 160 (src line 757)
 
 
 state 217
-	maybe_label:  BOTTOMK.    (161)
+	maybe_label:  BY.    (161)
 
-	.  reduce 161 (src line 760)
+	.  reduce 161 (src line 757)
 
 
 state 218
-	maybe_label:  BY.    (162)
+	maybe_label:  COUNT.    (162)
 
-	.  reduce 162 (src line 760)
+	.  reduce 162 (src line 757)
 
 
 state 219
-	maybe_label:  COUNT.    (163)
+	maybe_label:  COUNT_VALUES.    (163)
 
-	.  reduce 163 (src line 760)
+	.  reduce 163 (src line 757)
 
 
 state 220
-	maybe_label:  COUNT_VALUES.    (164)
+	maybe_label:  GROUP_LEFT.    (164)
 
-	.  reduce 164 (src line 760)
+	.  reduce 164 (src line 757)
 
 
 state 221
-	maybe_label:  GROUP_LEFT.    (165)
+	maybe_label:  GROUP_RIGHT.    (165)
 
-	.  reduce 165 (src line 760)
+	.  reduce 165 (src line 757)
 
 
 state 222
-	maybe_label:  GROUP_RIGHT.    (166)
+	maybe_label:  IDENTIFIER.    (166)
 
-	.  reduce 166 (src line 760)
+	.  reduce 166 (src line 757)
 
 
 state 223
-	maybe_label:  IDENTIFIER.    (167)
+	maybe_label:  IGNORING.    (167)
 
-	.  reduce 167 (src line 760)
+	.  reduce 167 (src line 757)
 
 
 state 224
-	maybe_label:  IGNORING.    (168)
+	maybe_label:  LAND.    (168)
 
-	.  reduce 168 (src line 760)
+	.  reduce 168 (src line 757)
 
 
 state 225
-	maybe_label:  LAND.    (169)
+	maybe_label:  LOR.    (169)
 
-	.  reduce 169 (src line 760)
+	.  reduce 169 (src line 757)
 
 
 state 226
-	maybe_label:  LOR.    (170)
+	maybe_label:  LUNLESS.    (170)
 
-	.  reduce 170 (src line 760)
+	.  reduce 170 (src line 757)
 
 
 state 227
-	maybe_label:  LUNLESS.    (171)
+	maybe_label:  MAX.    (171)
 
-	.  reduce 171 (src line 760)
+	.  reduce 171 (src line 757)
 
 
 state 228
-	maybe_label:  MAX.    (172)
+	maybe_label:  METRIC_IDENTIFIER.    (172)
 
-	.  reduce 172 (src line 760)
+	.  reduce 172 (src line 757)
 
 
 state 229
-	maybe_label:  METRIC_IDENTIFIER.    (173)
+	maybe_label:  MIN.    (173)
 
-	.  reduce 173 (src line 760)
+	.  reduce 173 (src line 757)
 
 
 state 230
-	maybe_label:  MIN.    (174)
+	maybe_label:  OFFSET.    (174)
 
-	.  reduce 174 (src line 760)
+	.  reduce 174 (src line 757)
 
 
 state 231
-	maybe_label:  OFFSET.    (175)
+	maybe_label:  ON.    (175)
 
-	.  reduce 175 (src line 760)
+	.  reduce 175 (src line 757)
 
 
 state 232
-	maybe_label:  ON.    (176)
+	maybe_label:  QUANTILE.    (176)
 
-	.  reduce 176 (src line 760)
+	.  reduce 176 (src line 757)
 
 
 state 233
-	maybe_label:  QUANTILE.    (177)
+	maybe_label:  STDDEV.    (177)
 
-	.  reduce 177 (src line 760)
+	.  reduce 177 (src line 757)
 
 
 state 234
-	maybe_label:  STDDEV.    (178)
+	maybe_label:  STDVAR.    (178)
 
-	.  reduce 178 (src line 760)
+	.  reduce 178 (src line 757)
 
 
 state 235
-	maybe_label:  STDVAR.    (179)
+	maybe_label:  SUM.    (179)
 
-	.  reduce 179 (src line 760)
+	.  reduce 179 (src line 757)
 
 
 state 236
-	maybe_label:  SUM.    (180)
+	maybe_label:  TOPK.    (180)
 
-	.  reduce 180 (src line 760)
+	.  reduce 180 (src line 757)
 
 
 state 237
-	maybe_label:  TOPK.    (181)
+	function_call_body:  LEFT_PAREN function_call_args RIGHT_PAREN.    (75)
 
-	.  reduce 181 (src line 760)
+	.  reduce 75 (src line 460)
 
 
 state 238
-	function_call_body:  LEFT_PAREN function_call_args RIGHT_PAREN.    (75)
-
-	.  reduce 75 (src line 462)
-
-
-state 239
 	function_call_args:  function_call_args COMMA.expr 
 	function_call_args:  function_call_args COMMA.    (79)
 
@@ -3452,14 +3445,14 @@ state 239
 	TOPK  shift 65
 	BY  shift 13
 	OFFSET  shift 23
-	.  reduce 79 (src line 472)
+	.  reduce 79 (src line 470)
 
 	aggregate_op  goto 47
 	metric_identifier  goto 53
 	unary_op  goto 52
 	aggregate_expr  goto 36
 	binary_expr  goto 37
-	expr  goto 260
+	expr  goto 259
 	function_call  goto 38
 	label_matchers  goto 54
 	matrix_selector  goto 39
@@ -3471,164 +3464,164 @@ state 239
 	unary_expr  goto 45
 	vector_selector  goto 46
 
-state 240
+state 239
 	label_matchers:  LEFT_BRACE label_match_list COMMA RIGHT_BRACE.    (94)
 
-	.  reduce 94 (src line 604)
+	.  reduce 94 (src line 602)
+
+
+state 240
+	label_match_list:  label_match_list COMMA label_matcher.    (96)
+
+	.  reduce 96 (src line 618)
 
 
 state 241
-	label_match_list:  label_match_list COMMA label_matcher.    (96)
+	label_matcher:  IDENTIFIER match_op STRING.    (99)
 
-	.  reduce 96 (src line 620)
+	.  reduce 99 (src line 632)
 
 
 state 242
-	label_matcher:  IDENTIFIER match_op STRING.    (99)
+	label_matcher:  IDENTIFIER match_op error.    (100)
 
-	.  reduce 99 (src line 634)
+	.  reduce 100 (src line 634)
 
 
 state 243
-	label_matcher:  IDENTIFIER match_op error.    (100)
-
-	.  reduce 100 (src line 636)
-
-
-state 244
 	series_item:  BLANK TIMES.uint 
 
-	NUMBER  shift 262
+	NUMBER  shift 261
 	.  error
 
-	uint  goto 261
+	uint  goto 260
 
-state 245
+state 244
 	series_item:  series_value TIMES.uint 
 
-	NUMBER  shift 262
+	NUMBER  shift 261
 	.  error
 
-	uint  goto 263
+	uint  goto 262
 
-state 246
+state 245
 	series_item:  series_value signed_number.TIMES uint 
 
-	TIMES  shift 264
+	TIMES  shift 263
 	.  error
+
+
+state 246
+	signed_number:  ADD number.    (189)
+
+	.  reduce 189 (src line 778)
 
 
 state 247
-	signed_number:  ADD number.    (190)
+	signed_number:  SUB number.    (190)
 
-	.  reduce 190 (src line 781)
+	.  reduce 190 (src line 779)
 
 
 state 248
-	signed_number:  SUB number.    (191)
+	on_or_ignoring:  bool_modifier IGNORING grouping_labels.    (59)
 
-	.  reduce 191 (src line 782)
+	.  reduce 59 (src line 378)
 
 
 state 249
-	on_or_ignoring:  bool_modifier IGNORING grouping_labels.    (59)
+	on_or_ignoring:  bool_modifier ON grouping_labels.    (60)
 
-	.  reduce 59 (src line 380)
+	.  reduce 60 (src line 383)
 
 
 state 250
-	on_or_ignoring:  bool_modifier ON grouping_labels.    (60)
+	group_modifiers:  on_or_ignoring GROUP_LEFT maybe_grouping_labels.    (63)
 
-	.  reduce 60 (src line 385)
+	.  reduce 63 (src line 393)
 
 
 state 251
-	group_modifiers:  on_or_ignoring GROUP_LEFT maybe_grouping_labels.    (63)
+	maybe_grouping_labels:  grouping_labels.    (197)
 
-	.  reduce 63 (src line 395)
+	.  reduce 197 (src line 822)
 
 
 state 252
-	maybe_grouping_labels:  grouping_labels.    (198)
+	group_modifiers:  on_or_ignoring GROUP_RIGHT maybe_grouping_labels.    (64)
 
-	.  reduce 198 (src line 825)
+	.  reduce 64 (src line 399)
 
 
 state 253
-	group_modifiers:  on_or_ignoring GROUP_RIGHT maybe_grouping_labels.    (64)
+	subquery_expr:  expr LEFT_BRACKET duration COLON maybe_duration.RIGHT_BRACKET 
 
-	.  reduce 64 (src line 401)
+	RIGHT_BRACKET  shift 264
+	.  error
 
 
 state 254
-	subquery_expr:  expr LEFT_BRACKET duration COLON maybe_duration.RIGHT_BRACKET 
+	subquery_expr:  expr LEFT_BRACKET duration COLON duration.error 
+	maybe_duration:  duration.    (195)
 
-	RIGHT_BRACKET  shift 265
+	error  shift 265
+	RIGHT_BRACKET  reduce 195 (src line 818)
 	.  error
 
 
 state 255
-	subquery_expr:  expr LEFT_BRACKET duration COLON duration.error 
-	maybe_duration:  duration.    (196)
+	subquery_expr:  expr LEFT_BRACKET duration COLON error.    (86)
 
-	error  shift 266
-	RIGHT_BRACKET  reduce 196 (src line 821)
-	.  error
+	.  reduce 86 (src line 537)
 
 
 state 256
-	subquery_expr:  expr LEFT_BRACKET duration COLON error.    (86)
+	grouping_labels:  LEFT_PAREN grouping_label_list RIGHT_PAREN.    (65)
 
-	.  reduce 86 (src line 539)
+	.  reduce 65 (src line 408)
 
 
 state 257
-	grouping_labels:  LEFT_PAREN grouping_label_list RIGHT_PAREN.    (65)
-
-	.  reduce 65 (src line 410)
-
-
-state 258
 	grouping_labels:  LEFT_PAREN grouping_label_list COMMA.RIGHT_PAREN 
 	grouping_label_list:  grouping_label_list COMMA.grouping_label 
 
-	error  shift 214
-	IDENTIFIER  shift 223
-	METRIC_IDENTIFIER  shift 229
-	RIGHT_PAREN  shift 267
-	LAND  shift 225
-	LOR  shift 226
-	LUNLESS  shift 227
-	AVG  shift 215
-	BOTTOMK  shift 217
-	COUNT  shift 219
-	COUNT_VALUES  shift 220
-	MAX  shift 228
-	MIN  shift 230
-	QUANTILE  shift 233
-	STDDEV  shift 234
-	STDVAR  shift 235
-	SUM  shift 236
-	TOPK  shift 237
-	BOOL  shift 216
-	BY  shift 218
-	GROUP_LEFT  shift 221
-	GROUP_RIGHT  shift 222
-	IGNORING  shift 224
-	OFFSET  shift 231
-	ON  shift 232
+	error  shift 213
+	IDENTIFIER  shift 222
+	METRIC_IDENTIFIER  shift 228
+	RIGHT_PAREN  shift 266
+	LAND  shift 224
+	LOR  shift 225
+	LUNLESS  shift 226
+	AVG  shift 214
+	BOTTOMK  shift 216
+	COUNT  shift 218
+	COUNT_VALUES  shift 219
+	MAX  shift 227
+	MIN  shift 229
+	QUANTILE  shift 232
+	STDDEV  shift 233
+	STDVAR  shift 234
+	SUM  shift 235
+	TOPK  shift 236
+	BOOL  shift 215
+	BY  shift 217
+	GROUP_LEFT  shift 220
+	GROUP_RIGHT  shift 221
+	IGNORING  shift 223
+	OFFSET  shift 230
+	ON  shift 231
 	.  error
 
-	grouping_label  goto 268
-	maybe_label  goto 213
+	grouping_label  goto 267
+	maybe_label  goto 212
 
-state 259
+state 258
 	grouping_label_list:  grouping_label_list error.    (71)
 
-	.  reduce 71 (src line 426)
+	.  reduce 71 (src line 424)
 
 
-state 260
+state 259
 	binary_expr:  expr.ADD bin_modifier expr 
 	binary_expr:  expr.DIV bin_modifier expr 
 	binary_expr:  expr.EQL bin_modifier expr 
@@ -3671,74 +3664,74 @@ state 260
 	POW  shift 95
 	SUB  shift 96
 	OFFSET  shift 97
-	.  reduce 77 (src line 468)
+	.  reduce 77 (src line 466)
+
+
+state 260
+	series_item:  BLANK TIMES uint.    (140)
+
+	.  reduce 140 (src line 709)
 
 
 state 261
-	series_item:  BLANK TIMES uint.    (140)
+	uint:  NUMBER.    (191)
 
-	.  reduce 140 (src line 711)
+	.  reduce 191 (src line 782)
 
 
 state 262
-	uint:  NUMBER.    (192)
+	series_item:  series_value TIMES uint.    (142)
 
-	.  reduce 192 (src line 785)
+	.  reduce 142 (src line 718)
 
 
 state 263
-	series_item:  series_value TIMES uint.    (142)
-
-	.  reduce 142 (src line 720)
-
-
-state 264
 	series_item:  series_value signed_number TIMES.uint 
 
-	NUMBER  shift 262
+	NUMBER  shift 261
 	.  error
 
-	uint  goto 269
+	uint  goto 268
 
-state 265
+state 264
 	subquery_expr:  expr LEFT_BRACKET duration COLON maybe_duration RIGHT_BRACKET.    (84)
 
-	.  reduce 84 (src line 527)
+	.  reduce 84 (src line 525)
+
+
+state 265
+	subquery_expr:  expr LEFT_BRACKET duration COLON duration error.    (85)
+
+	.  reduce 85 (src line 535)
 
 
 state 266
-	subquery_expr:  expr LEFT_BRACKET duration COLON duration error.    (85)
+	grouping_labels:  LEFT_PAREN grouping_label_list COMMA RIGHT_PAREN.    (66)
 
-	.  reduce 85 (src line 537)
+	.  reduce 66 (src line 410)
 
 
 state 267
-	grouping_labels:  LEFT_PAREN grouping_label_list COMMA RIGHT_PAREN.    (66)
+	grouping_label_list:  grouping_label_list COMMA grouping_label.    (69)
 
-	.  reduce 66 (src line 412)
+	.  reduce 69 (src line 419)
 
 
 state 268
-	grouping_label_list:  grouping_label_list COMMA grouping_label.    (69)
-
-	.  reduce 69 (src line 421)
-
-
-state 269
 	series_item:  series_value signed_number TIMES uint.    (143)
 
-	.  reduce 143 (src line 727)
+	.  reduce 143 (src line 725)
 
 
 72 terminals, 47 nonterminals
-199 grammar rules, 270/8000 states
+198 grammar rules, 269/8000 states
 15 shift/reduce, 0 reduce/reduce conflicts reported
 146 working sets used
 memory: parser 611/120000
 141 extra closures
-943 shift entries, 96 exceptions
+942 shift entries, 96 exceptions
 116 goto entries
 348 entries saved by goto default
-Optimizer space used: output 560/120000
-560 table entries, 114 zero
-maximum spread: 71, maximum offset: 264
+Optimizer space used: output 535/120000
+535 table entries, 90 zero
+maximum spread: 71, maximum offset: 263
