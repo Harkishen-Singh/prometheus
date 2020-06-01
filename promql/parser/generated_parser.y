@@ -168,21 +168,21 @@ start           :
                 | START_SERIES_DESCRIPTION series_description
                 | START_EXPRESSION comment_expr
                         {
-                                ce := &CommentExpr{
-                                        IsHead: true,
-                                        CommentPtr: $2,
-                                }
-                                yylex.(*parser).generatedParserResult = ce
+                        ce := &CommentExpr{
+                                IsHead: true,
+                                CommentPtr: $2,
+                        }
+                        yylex.(*parser).generatedParserResult = ce
                         }
                 | START_EXPRESSION comment_expr expr 
                         {
-                                ce := &CommentExpr{
-                                        IsHead: true,
-                                        CommentPtr: $2,
-                                        Expr: $3.(Expr),
-                                        PosRange: $3.PositionRange(),
-                                }
-                                yylex.(*parser).generatedParserResult = ce
+                        ce := &CommentExpr{
+                                IsHead: true,
+                                CommentPtr: $2,
+                                Expr: $3.(Expr),
+                                PosRange: $3.PositionRange(),
+                        }
+                        yylex.(*parser).generatedParserResult = ce
                         }
                 | START_EXPRESSION /* empty */ EOF
                         { yylex.(*parser).addParseErrf(PositionRange{}, "no expression found in input")}
@@ -205,7 +205,6 @@ expr            :
                                 CommentPtr: $2,
                                 Expr: $1.(Expr),
                         }
-                        
                         }
                 | binary_expr
                 | binary_expr comment_expr
@@ -297,11 +296,11 @@ comment_expr    :
                                 Addr: nil,
                         }
                         }
-                | comment_expr COMMENT
+                | COMMENT comment_expr
                         {
                                 $$ =  &CommentLinkedList{
-                                        Comment: $2.Val,
-                                        Addr: $1,
+                                        Comment: $1.Val,
+                                        Addr: $2,
                                 } 
                         }
                 ;

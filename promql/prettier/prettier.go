@@ -151,13 +151,37 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 		if err != nil {
 			return "", err
 		}
-		format += padding(indent)
+		// format += padding(indent)
+		head := n.CommentPtr
 		if n.IsHead {
-			format += n.Comment + "\n"
+			for {
+				if head == nil {
+					break
+				}
+				format += padding(indent+1) + head.Comment + "\n"
+				head = head.Addr
+			}
 			format += padding(indent) + s + "\n"
 		} else {
-			format += strings.TrimSpace(s) + " " + n.Comment
+			var firstRead bool
+			for {
+				if head == nil {
+					break
+				}
+				fmt.Println("head comment is ", head.Comment)
+				fmt.Println(format)
+				if !firstRead {
+					firstRead = true
+					format += s + " " + head.Comment
+				} else {
+					format += "\n" + padding(indent) + head.Comment
+				}
+				// format += "\n"
+				head = head.Addr
+			}
 		}
+		fmt.Println("comment_expr below")
+		fmt.Println(format)
 	case *parser.VectorSelector:
 		var containsLabels bool
 		metricName, err := getMetricName(n.LabelMatchers)

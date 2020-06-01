@@ -110,8 +110,6 @@ func main() {
 	).Required().ExistingFiles()
 
 	parsedCmd := kingpin.MustParse(app.Parse(os.Args[1:]))
-	fmt.Println("parsed cmd is ", parsedCmd)
-	fmt.Println(prettifyRuleFiles.FullCommand())
 
 	var p printer
 	switch *queryCmdFmt {
