@@ -210,8 +210,10 @@ func (i ItemType) desc() string {
 
 const eof = -1
 
-// stateFn represents the state of the scanner as a function that returns the next state.
-type stateFn func(*Lexer) stateFn
+// StateFn represents the state of the scanner as a function that returns the next state.
+type StateFn func(*Lexer) StateFn
+
+// type StateFn = stateFn
 
 // Pos is the position in a string.
 // Negative numbers indicate undefined positions.
@@ -220,7 +222,7 @@ type Pos int
 // Lexer holds the state of the scanner.
 type Lexer struct {
 	input       string  // The string being scanned.
-	state       stateFn // The next lexing function to enter.
+	State       StateFn // The next lexing function to enter.
 	pos         Pos     // Current position in the input.
 	start       Pos     // Start position of this Item.
 	width       Pos     // Width of last rune read from input.
@@ -294,7 +296,7 @@ func (l *Lexer) acceptRun(valid string) {
 
 // errorf returns an error token and terminates the scan by passing
 // back a nil pointer that will be the next state, terminating l.NextItem.
-func (l *Lexer) errorf(format string, args ...interface{}) stateFn {
+func (l *Lexer) errorf(format string, args ...interface{}) StateFn {
 	*l.itemp = Item{ERROR, l.start, fmt.Sprintf(format, args...)}
 	l.scannedItem = true
 
@@ -306,9 +308,9 @@ func (l *Lexer) NextItem(itemp *Item) {
 	l.scannedItem = false
 	l.itemp = itemp
 
-	if l.state != nil {
+	if l.State != nil {
 		for !l.scannedItem {
-			l.state = l.state(l)
+			l.State = l.State(l)
 		}
 	} else {
 		l.emit(EOF)
@@ -321,7 +323,7 @@ func (l *Lexer) NextItem(itemp *Item) {
 func Lex(input string) *Lexer {
 	l := &Lexer{
 		input: input,
-		state: lexStatements,
+		State: lexStatements,
 	}
 	return l
 }
@@ -329,8 +331,13 @@ func Lex(input string) *Lexer {
 // lineComment is the character that starts a line comment.
 const lineComment = "#"
 
+// LexStatements exports lexStatements.
+func LexStatements(l *Lexer) StateFn {
+	return lexStatements
+}
+
 // lexStatements is the top-level state for lexing.
-func lexStatements(l *Lexer) stateFn {
+func lexStatements(l *Lexer) StateFn {
 	if l.braceOpen {
 		return lexInsideBraces
 	}
@@ -452,7 +459,7 @@ func lexStatements(l *Lexer) stateFn {
 
 // lexInsideBraces scans the inside of a vector selector. Keywords are ignored and
 // scanned as identifiers.
-func lexInsideBraces(l *Lexer) stateFn {
+func lexInsideBraces(l *Lexer) StateFn {
 	if strings.HasPrefix(l.input[l.pos:], lineComment) {
 		return lexLineComment
 	}
@@ -506,7 +513,7 @@ func lexInsideBraces(l *Lexer) stateFn {
 }
 
 // lexValueSequence scans a value sequence of a series description.
-func lexValueSequence(l *Lexer) stateFn {
+func lexValueSequence(l *Lexer) StateFn {
 	switch r := l.next(); {
 	case r == eof:
 		return lexStatements
@@ -542,7 +549,7 @@ func lexValueSequence(l *Lexer) stateFn {
 // package of the Go standard library to work for Prometheus-style strings.
 // None of the actual escaping/quoting logic was changed in this function - it
 // was only modified to integrate with our lexer.
-func lexEscape(l *Lexer) stateFn {
+func lexEscape(l *Lexer) StateFn {
 	var n int
 	var base, max uint32
 
@@ -614,7 +621,7 @@ func skipSpaces(l *Lexer) {
 }
 
 // lexString scans a quoted string. The initial quote has already been seen.
-func lexString(l *Lexer) stateFn {
+func lexString(l *Lexer) StateFn {
 Loop:
 	for {
 		switch l.next() {
@@ -634,7 +641,7 @@ Loop:
 }
 
 // lexRawString scans a raw quoted string. The initial quote has already been seen.
-func lexRawString(l *Lexer) stateFn {
+func lexRawString(l *Lexer) StateFn {
 Loop:
 	for {
 		switch l.next() {
@@ -653,7 +660,7 @@ Loop:
 }
 
 // lexSpace scans a run of space characters. One space has already been seen.
-func lexSpace(l *Lexer) stateFn {
+func lexSpace(l *Lexer) StateFn {
 	for isSpace(l.peek()) {
 		l.next()
 	}
@@ -662,7 +669,7 @@ func lexSpace(l *Lexer) stateFn {
 }
 
 // lexLineComment scans a line comment. Left comment marker is known to be present.
-func lexLineComment(l *Lexer) stateFn {
+func lexLineComment(l *Lexer) StateFn {
 	l.pos += Pos(len(lineComment))
 	for r := l.next(); !isEndOfLine(r) && r != eof; {
 		r = l.next()
@@ -672,7 +679,7 @@ func lexLineComment(l *Lexer) stateFn {
 	return lexStatements
 }
 
-func lexDuration(l *Lexer) stateFn {
+func lexDuration(l *Lexer) StateFn {
 	if l.scanNumber() {
 		return l.errorf("missing unit character in duration")
 	}
@@ -689,7 +696,7 @@ func lexDuration(l *Lexer) stateFn {
 }
 
 // lexNumber scans a number: decimal, hex, oct or float.
-func lexNumber(l *Lexer) stateFn {
+func lexNumber(l *Lexer) StateFn {
 	if !l.scanNumber() {
 		return l.errorf("bad number syntax: %q", l.input[l.start:l.pos])
 	}
@@ -698,7 +705,7 @@ func lexNumber(l *Lexer) stateFn {
 }
 
 // lexNumberOrDuration scans a number or a duration Item.
-func lexNumberOrDuration(l *Lexer) stateFn {
+func lexNumberOrDuration(l *Lexer) StateFn {
 	if l.scanNumber() {
 		l.emit(NUMBER)
 		return lexStatements
@@ -741,7 +748,7 @@ func (l *Lexer) scanNumber() bool {
 
 // lexIdentifier scans an alphanumeric identifier. The next character
 // is known to be a letter.
-func lexIdentifier(l *Lexer) stateFn {
+func lexIdentifier(l *Lexer) StateFn {
 	for isAlphaNumeric(l.next()) {
 		// absorb
 	}
@@ -753,7 +760,7 @@ func lexIdentifier(l *Lexer) stateFn {
 // lexKeywordOrIdentifier scans an alphanumeric identifier which may contain
 // a colon rune. If the identifier is a keyword the respective keyword Item
 // is scanned.
-func lexKeywordOrIdentifier(l *Lexer) stateFn {
+func lexKeywordOrIdentifier(l *Lexer) StateFn {
 Loop:
 	for {
 		switch r := l.next(); {

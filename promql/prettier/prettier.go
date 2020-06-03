@@ -243,24 +243,39 @@ func (p *Prettier) Run() []error {
 			for _, grps := range rgs.Groups {
 				for _, rules := range grps.Rules {
 					exprStr := rules.Expr.Value
-					expr, err := p.parseExpr(exprStr)
-					if err != nil {
-						return []error{errors.Wrap(err, "parse error")}
+					// expr, err := p.parseExpr(exprStr)
+					// if err != nil {
+					// 	return []error{errors.Wrap(err, "parse error")}
+					// }
+					// fmt.Printf("%v\n", expr)
+					// formattedExpr, err := p.Prettify(expr, reflect.TypeOf(""), 0, "")
+					// if err != nil {
+					// 	return []error{errors.Wrap(err, "prettier error")}
+					// }
+					// fmt.Println("raw\n", formattedExpr)
+					// rules.Expr.SetString(formattedExpr)
+					res := p.lexItems(exprStr)
+					fmt.Println(res)
+					for i := 0; i < len(res); i++ {
+						fmt.Println(res[i].Typ, " ", res[i].Val)
 					}
-					fmt.Printf("%v\n", expr)
-					formattedExpr, err := p.Prettify(expr, reflect.TypeOf(""), 0, "")
-					if err != nil {
-						return []error{errors.Wrap(err, "prettier error")}
-					}
-					fmt.Println("raw\n", formattedExpr)
-
-					rules.Expr.SetString(formattedExpr)
 				}
 			}
 		}
 
 	}
 	return nil
+}
+
+// lexItems converts the given expression into a slice of Items.
+func (p *Prettier) lexItems(expression string) (items []parser.Item) {
+	l := parser.Lex(expression)
+
+	for l.State = parser.LexStatements; l.State != nil; {
+		items = append(items, parser.Item{})
+		l.NextItem(&items[len(items)-1])
+	}
+	return
 }
 
 func (p *Prettier) parseExpr(expression string) (parser.Expr, error) {

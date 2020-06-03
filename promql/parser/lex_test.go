@@ -14,6 +14,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/prometheus/prometheus/util/testutil"
@@ -30,6 +31,180 @@ var tests = []struct {
 	name  string
 	tests []testCase
 }{
+	{
+		name: "subqueries",
+		tests: []testCase{
+			{
+				input: `test_name{on!~"bar"}[4m:4s]`,
+				expected: []Item{
+					{IDENTIFIER, 0, `test_name`},
+					{LEFT_BRACE, 9, `{`},
+					{IDENTIFIER, 10, `on`},
+					{NEQ_REGEX, 12, `!~`},
+					{STRING, 14, `"bar"`},
+					{RIGHT_BRACE, 19, `}`},
+					{LEFT_BRACKET, 20, `[`},
+					{DURATION, 21, `4m`},
+					{COLON, 23, `:`},
+					{DURATION, 24, `4s`},
+					{RIGHT_BRACKET, 26, `]`},
+				},
+			},
+			{
+				input: `test:name{on!~"bar"}[4m:4s]`,
+				expected: []Item{
+					{METRIC_IDENTIFIER, 0, `test:name`},
+					{LEFT_BRACE, 9, `{`},
+					{IDENTIFIER, 10, `on`},
+					{NEQ_REGEX, 12, `!~`},
+					{STRING, 14, `"bar"`},
+					{RIGHT_BRACE, 19, `}`},
+					{LEFT_BRACKET, 20, `[`},
+					{DURATION, 21, `4m`},
+					{COLON, 23, `:`},
+					{DURATION, 24, `4s`},
+					{RIGHT_BRACKET, 26, `]`},
+				},
+			}, {
+				input: `test:name{on!~"b:ar"}[4m:4s]`,
+				expected: []Item{
+					{METRIC_IDENTIFIER, 0, `test:name`},
+					{LEFT_BRACE, 9, `{`},
+					{IDENTIFIER, 10, `on`},
+					{NEQ_REGEX, 12, `!~`},
+					{STRING, 14, `"b:ar"`},
+					{RIGHT_BRACE, 20, `}`},
+					{LEFT_BRACKET, 21, `[`},
+					{DURATION, 22, `4m`},
+					{COLON, 24, `:`},
+					{DURATION, 25, `4s`},
+					{RIGHT_BRACKET, 27, `]`},
+				},
+			}, {
+				input: `test:name{on!~"b:ar"}[4m:]`,
+				expected: []Item{
+					{METRIC_IDENTIFIER, 0, `test:name`},
+					{LEFT_BRACE, 9, `{`},
+					{IDENTIFIER, 10, `on`},
+					{NEQ_REGEX, 12, `!~`},
+					{STRING, 14, `"b:ar"`},
+					{RIGHT_BRACE, 20, `}`},
+					{LEFT_BRACKET, 21, `[`},
+					{DURATION, 22, `4m`},
+					{COLON, 24, `:`},
+					{RIGHT_BRACKET, 25, `]`},
+				},
+			}, { // Nested Subquery.
+				input: `min_over_time(rate(foo{bar="baz"}[2s])[5m:])[4m:3s]`,
+				expected: []Item{
+
+					{IDENTIFIER, 0, `min_over_time`},
+					{LEFT_PAREN, 13, `(`},
+					{IDENTIFIER, 14, `rate`},
+					{LEFT_PAREN, 18, `(`},
+					{IDENTIFIER, 19, `foo`},
+					{LEFT_BRACE, 22, `{`},
+					{IDENTIFIER, 23, `bar`},
+					{EQL, 26, `=`},
+					{STRING, 27, `"baz"`},
+					{RIGHT_BRACE, 32, `}`},
+					{LEFT_BRACKET, 33, `[`},
+					{DURATION, 34, `2s`},
+					{RIGHT_BRACKET, 36, `]`},
+					{RIGHT_PAREN, 37, `)`},
+					{LEFT_BRACKET, 38, `[`},
+					{DURATION, 39, `5m`},
+					{COLON, 41, `:`},
+					{RIGHT_BRACKET, 42, `]`},
+					{RIGHT_PAREN, 43, `)`},
+					{LEFT_BRACKET, 44, `[`},
+					{DURATION, 45, `4m`},
+					{COLON, 47, `:`},
+					{DURATION, 48, `3s`},
+					{RIGHT_BRACKET, 50, `]`},
+				},
+			},
+			// Subquery with offset.
+			{
+				input: `test:name{on!~"b:ar"}[4m:4s] offset 10m`,
+				expected: []Item{
+					{METRIC_IDENTIFIER, 0, `test:name`},
+					{LEFT_BRACE, 9, `{`},
+					{IDENTIFIER, 10, `on`},
+					{NEQ_REGEX, 12, `!~`},
+					{STRING, 14, `"b:ar"`},
+					{RIGHT_BRACE, 20, `}`},
+					{LEFT_BRACKET, 21, `[`},
+					{DURATION, 22, `4m`},
+					{COLON, 24, `:`},
+					{DURATION, 25, `4s`},
+					{RIGHT_BRACKET, 27, `]`},
+					{OFFSET, 29, "offset"},
+					{DURATION, 36, "10m"},
+				},
+			}, {
+				input: `min_over_time(rate(foo{bar="baz"}[2s])[5m:] offset 6m)[4m:3s]`,
+				expected: []Item{
+
+					{IDENTIFIER, 0, `min_over_time`},
+					{LEFT_PAREN, 13, `(`},
+					{IDENTIFIER, 14, `rate`},
+					{LEFT_PAREN, 18, `(`},
+					{IDENTIFIER, 19, `foo`},
+					{LEFT_BRACE, 22, `{`},
+					{IDENTIFIER, 23, `bar`},
+					{EQL, 26, `=`},
+					{STRING, 27, `"baz"`},
+					{RIGHT_BRACE, 32, `}`},
+					{LEFT_BRACKET, 33, `[`},
+					{DURATION, 34, `2s`},
+					{RIGHT_BRACKET, 36, `]`},
+					{RIGHT_PAREN, 37, `)`},
+					{LEFT_BRACKET, 38, `[`},
+					{DURATION, 39, `5m`},
+					{COLON, 41, `:`},
+					{RIGHT_BRACKET, 42, `]`},
+					{OFFSET, 44, `offset`},
+					{DURATION, 51, `6m`},
+					{RIGHT_PAREN, 53, `)`},
+					{LEFT_BRACKET, 54, `[`},
+					{DURATION, 55, `4m`},
+					{COLON, 57, `:`},
+					{DURATION, 58, `3s`},
+					{RIGHT_BRACKET, 60, `]`},
+				},
+			},
+			{
+				input: `test:name[ 5m]`,
+				expected: []Item{
+					{METRIC_IDENTIFIER, 0, `test:name`},
+					{LEFT_BRACKET, 9, `[`},
+					{DURATION, 11, `5m`},
+					{RIGHT_BRACKET, 13, `]`},
+				},
+			},
+			{
+				input: `test:name{o:n!~"bar"}[4m:4s]`,
+				fail:  true,
+			},
+			{
+				input: `test:name{on!~"bar"}[4m:4s:4h]`,
+				fail:  true,
+			},
+			{
+				input: `test:name{on!~"bar"}[4m:4s:]`,
+				fail:  true,
+			},
+			{
+				input: `test:name{on!~"bar"}[4m::]`,
+				fail:  true,
+			},
+			{
+				input: `test:name{on!~"bar"}[:4s]`,
+				fail:  true,
+			},
+		},
+	},
 	{
 		name: "common",
 		tests: []testCase{
@@ -511,180 +686,6 @@ var tests = []struct {
 			},
 		},
 	},
-	{
-		name: "subqueries",
-		tests: []testCase{
-			{
-				input: `test_name{on!~"bar"}[4m:4s]`,
-				expected: []Item{
-					{IDENTIFIER, 0, `test_name`},
-					{LEFT_BRACE, 9, `{`},
-					{IDENTIFIER, 10, `on`},
-					{NEQ_REGEX, 12, `!~`},
-					{STRING, 14, `"bar"`},
-					{RIGHT_BRACE, 19, `}`},
-					{LEFT_BRACKET, 20, `[`},
-					{DURATION, 21, `4m`},
-					{COLON, 23, `:`},
-					{DURATION, 24, `4s`},
-					{RIGHT_BRACKET, 26, `]`},
-				},
-			},
-			{
-				input: `test:name{on!~"bar"}[4m:4s]`,
-				expected: []Item{
-					{METRIC_IDENTIFIER, 0, `test:name`},
-					{LEFT_BRACE, 9, `{`},
-					{IDENTIFIER, 10, `on`},
-					{NEQ_REGEX, 12, `!~`},
-					{STRING, 14, `"bar"`},
-					{RIGHT_BRACE, 19, `}`},
-					{LEFT_BRACKET, 20, `[`},
-					{DURATION, 21, `4m`},
-					{COLON, 23, `:`},
-					{DURATION, 24, `4s`},
-					{RIGHT_BRACKET, 26, `]`},
-				},
-			}, {
-				input: `test:name{on!~"b:ar"}[4m:4s]`,
-				expected: []Item{
-					{METRIC_IDENTIFIER, 0, `test:name`},
-					{LEFT_BRACE, 9, `{`},
-					{IDENTIFIER, 10, `on`},
-					{NEQ_REGEX, 12, `!~`},
-					{STRING, 14, `"b:ar"`},
-					{RIGHT_BRACE, 20, `}`},
-					{LEFT_BRACKET, 21, `[`},
-					{DURATION, 22, `4m`},
-					{COLON, 24, `:`},
-					{DURATION, 25, `4s`},
-					{RIGHT_BRACKET, 27, `]`},
-				},
-			}, {
-				input: `test:name{on!~"b:ar"}[4m:]`,
-				expected: []Item{
-					{METRIC_IDENTIFIER, 0, `test:name`},
-					{LEFT_BRACE, 9, `{`},
-					{IDENTIFIER, 10, `on`},
-					{NEQ_REGEX, 12, `!~`},
-					{STRING, 14, `"b:ar"`},
-					{RIGHT_BRACE, 20, `}`},
-					{LEFT_BRACKET, 21, `[`},
-					{DURATION, 22, `4m`},
-					{COLON, 24, `:`},
-					{RIGHT_BRACKET, 25, `]`},
-				},
-			}, { // Nested Subquery.
-				input: `min_over_time(rate(foo{bar="baz"}[2s])[5m:])[4m:3s]`,
-				expected: []Item{
-
-					{IDENTIFIER, 0, `min_over_time`},
-					{LEFT_PAREN, 13, `(`},
-					{IDENTIFIER, 14, `rate`},
-					{LEFT_PAREN, 18, `(`},
-					{IDENTIFIER, 19, `foo`},
-					{LEFT_BRACE, 22, `{`},
-					{IDENTIFIER, 23, `bar`},
-					{EQL, 26, `=`},
-					{STRING, 27, `"baz"`},
-					{RIGHT_BRACE, 32, `}`},
-					{LEFT_BRACKET, 33, `[`},
-					{DURATION, 34, `2s`},
-					{RIGHT_BRACKET, 36, `]`},
-					{RIGHT_PAREN, 37, `)`},
-					{LEFT_BRACKET, 38, `[`},
-					{DURATION, 39, `5m`},
-					{COLON, 41, `:`},
-					{RIGHT_BRACKET, 42, `]`},
-					{RIGHT_PAREN, 43, `)`},
-					{LEFT_BRACKET, 44, `[`},
-					{DURATION, 45, `4m`},
-					{COLON, 47, `:`},
-					{DURATION, 48, `3s`},
-					{RIGHT_BRACKET, 50, `]`},
-				},
-			},
-			// Subquery with offset.
-			{
-				input: `test:name{on!~"b:ar"}[4m:4s] offset 10m`,
-				expected: []Item{
-					{METRIC_IDENTIFIER, 0, `test:name`},
-					{LEFT_BRACE, 9, `{`},
-					{IDENTIFIER, 10, `on`},
-					{NEQ_REGEX, 12, `!~`},
-					{STRING, 14, `"b:ar"`},
-					{RIGHT_BRACE, 20, `}`},
-					{LEFT_BRACKET, 21, `[`},
-					{DURATION, 22, `4m`},
-					{COLON, 24, `:`},
-					{DURATION, 25, `4s`},
-					{RIGHT_BRACKET, 27, `]`},
-					{OFFSET, 29, "offset"},
-					{DURATION, 36, "10m"},
-				},
-			}, {
-				input: `min_over_time(rate(foo{bar="baz"}[2s])[5m:] offset 6m)[4m:3s]`,
-				expected: []Item{
-
-					{IDENTIFIER, 0, `min_over_time`},
-					{LEFT_PAREN, 13, `(`},
-					{IDENTIFIER, 14, `rate`},
-					{LEFT_PAREN, 18, `(`},
-					{IDENTIFIER, 19, `foo`},
-					{LEFT_BRACE, 22, `{`},
-					{IDENTIFIER, 23, `bar`},
-					{EQL, 26, `=`},
-					{STRING, 27, `"baz"`},
-					{RIGHT_BRACE, 32, `}`},
-					{LEFT_BRACKET, 33, `[`},
-					{DURATION, 34, `2s`},
-					{RIGHT_BRACKET, 36, `]`},
-					{RIGHT_PAREN, 37, `)`},
-					{LEFT_BRACKET, 38, `[`},
-					{DURATION, 39, `5m`},
-					{COLON, 41, `:`},
-					{RIGHT_BRACKET, 42, `]`},
-					{OFFSET, 44, `offset`},
-					{DURATION, 51, `6m`},
-					{RIGHT_PAREN, 53, `)`},
-					{LEFT_BRACKET, 54, `[`},
-					{DURATION, 55, `4m`},
-					{COLON, 57, `:`},
-					{DURATION, 58, `3s`},
-					{RIGHT_BRACKET, 60, `]`},
-				},
-			},
-			{
-				input: `test:name[ 5m]`,
-				expected: []Item{
-					{METRIC_IDENTIFIER, 0, `test:name`},
-					{LEFT_BRACKET, 9, `[`},
-					{DURATION, 11, `5m`},
-					{RIGHT_BRACKET, 13, `]`},
-				},
-			},
-			{
-				input: `test:name{o:n!~"bar"}[4m:4s]`,
-				fail:  true,
-			},
-			{
-				input: `test:name{on!~"bar"}[4m:4s:4h]`,
-				fail:  true,
-			},
-			{
-				input: `test:name{on!~"bar"}[4m:4s:]`,
-				fail:  true,
-			},
-			{
-				input: `test:name{on!~"bar"}[4m::]`,
-				fail:  true,
-			},
-			{
-				input: `test:name{on!~"bar"}[:4s]`,
-				fail:  true,
-			},
-		},
-	},
 }
 
 // TestLexer tests basic functionality of the lexer. More elaborate tests are implemented
@@ -700,11 +701,12 @@ func TestLexer(t *testing.T) {
 
 				var out []Item
 
-				for l.state = lexStatements; l.state != nil; {
+				for l.State = lexStatements; l.State != nil; {
 					out = append(out, Item{})
 
 					l.NextItem(&out[len(out)-1])
 				}
+				fmt.Println("out is", out)
 
 				lastItem := out[len(out)-1]
 				if test.fail {
