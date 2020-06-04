@@ -30,6 +30,12 @@ type Prettier struct {
 	files      []string
 	expression string
 	Type       uint
+	pd         *padder
+}
+
+type padder struct {
+	indent         string
+	previous, buff int
 }
 
 // New returns a new prettier over the given slice of files.
@@ -55,7 +61,14 @@ func New(Type uint, content interface{}) (*Prettier, error) {
 		files:      files,
 		expression: expression,
 		Type:       typ,
+		pd:         newPadder(),
 	}, nil
+}
+
+func newPadder() *padder {
+	return &padder{
+		indent: "  ", // 2 space
+	}
 }
 
 var i = 0
@@ -214,6 +227,57 @@ func (p *Prettier) Prettify(expr parser.Expr, prevType reflect.Type, indent int,
 	return format, nil
 }
 
+func (p *Prettier) prettifyItems(items []parser.Item, index int, result string) string {
+	item := items[index]
+	value := item.Val
+	switch item.Typ {
+	case parser.LEFT_PAREN:
+		result += p.pd.apply() + value + "\n" + p.pd.inc(1).resume()
+	case parser.RIGHT_PAREN:
+		result += "\n" + p.pd.dec(1).apply() + value
+	case parser.LEFT_BRACE, parser.LEFT_BRACKET:
+		result += value + "\n" + p.pd.inc(1).resume()
+	case parser.RIGHT_BRACE, parser.RIGHT_BRACKET:
+		result += p.pd.dec(1).apply() + value
+	case parser.IDENTIFIER, parser.DURATION, parser.NUMBER:
+		result += p.pd.apply() + value
+	case parser.STRING:
+		result += value + ",\n"
+	case parser.SUM:
+		result += p.pd.apply() + value
+	case parser.COLON, parser.EQL, parser.EQL_REGEX, parser.NEQ, parser.NEQ_REGEX:
+		result += value
+	case parser.ADD, parser.SUB, parser.DIV, parser.MUL:
+		result += "\n" + p.pd.dec(1).apply() + value + "\n" + p.pd.inc(1).resume()
+	case parser.GTR, parser.BOOL:
+		if items[index+1].Typ == parser.BOOL {
+			index++
+			result += "\n" + p.pd.dec(1).apply() + value + " " + items[index].Val + "\n" + p.pd.inc(1).resume()
+		} else {
+			result += "\n" + p.pd.dec(1).apply() + value + "\n" + p.pd.inc(1).resume()
+		}
+	case parser.COMMENT:
+		result += p.pd.apply() + value + "\n"
+
+	case parser.BLANK:
+	}
+	if item.Typ == parser.EOF || len(items) == index+1 {
+		return p.removeTrailingLines(result)
+	}
+	return p.prettifyItems(items, index+1, result)
+}
+
+func (p *Prettier) removeTrailingLines(s string) string {
+	lines := strings.Split(s, "\n")
+	result := ""
+	for i := 0; i < len(lines); i++ {
+		if len(strings.TrimSpace(lines[i])) != 0 {
+			result += lines[i] + "\n"
+		}
+	}
+	return result
+}
+
 type ruleGroupFiles struct {
 	filename   string
 	ruleGroups *rulefmt.RuleGroups
@@ -259,6 +323,10 @@ func (p *Prettier) Run() []error {
 					for i := 0; i < len(res); i++ {
 						fmt.Println(res[i].Typ, " ", res[i].Val)
 					}
+					p.pd.buff = 1
+					formattedExpr := p.prettifyItems(res, 0, "")
+					fmt.Println("output is ")
+					fmt.Println(formattedExpr)
 				}
 			}
 		}
@@ -359,4 +427,49 @@ func padding(itr int) string {
 		pad += space
 	}
 	return pad
+}
+
+// prev applies the previous padding without any change.
+// func (pd *padder) prev() string {
+// 	pad := ""
+// 	for i := 1; i <= pd.buff; i++ {
+// 		pad += pd.indent
+// 	}
+// 	return pad
+// }
+
+// inc increments the padding by by adding the pad value
+// to the previous padded value.
+func (pd *padder) inc(iter int) *padder {
+	pd.buff += iter
+	return pd
+}
+
+// dec decrements the padding by by removing the pad value
+// to the previous padded value.
+func (pd *padder) dec(iter int) *padder {
+	pd.buff -= iter
+	return pd
+}
+
+// apply applies the padding.
+func (pd *padder) apply() string {
+	pad := ""
+	for i := 1; i <= pd.buff; i++ {
+		pad += pd.indent
+	}
+	return pad
+}
+
+// pad provides an instantenous padding.
+func (pd *padder) pad(iter int) string {
+	pad := ""
+	for i := 1; i <= iter; i++ {
+		pad += pd.indent
+	}
+	return pad
+}
+
+func (pd *padder) resume() string {
+	return ""
 }

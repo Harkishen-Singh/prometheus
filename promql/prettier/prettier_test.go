@@ -1,6 +1,7 @@
 package prettier
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -192,5 +193,201 @@ func TestPrettify(t *testing.T) {
 		formatted, err := p.Prettify(expression, reflect.TypeOf(""), 0, "")
 		testutil.Ok(t, err)
 		testutil.Equals(t, expr.expected, formatted, "formatting does not match")
+	}
+}
+
+var exprsItems = []prettierTest{
+	{
+		expr: "first + second + third",
+		expected: `  first
++
+  second
++
+  third
+`,
+	},
+	{
+		expr: `first{foo="bar",a="b", c="d"}`,
+		expected: `  first{
+    foo="bar",
+    a="b",
+    c="d",
+  }
+`,
+	},
+	{
+		expr: `first{c="d",
+			foo="bar",a="b",}`,
+		expected: `  first{
+    c="d",
+    foo="bar",
+    a="b",
+  }
+`,
+	},
+	{
+		expr: `first{foo="bar",a="b", c="d"} + second{foo="bar", c="d"}`,
+		expected: `  first{
+    foo="bar",
+    a="b",
+    c="d",
+  }
++
+  second{
+    foo="bar",
+    c="d",
+  }
+`,
+	},
+	{
+		expr: `(first)`,
+		expected: `  (
+    first
+  )
+`,
+	},
+
+	{
+		expr: `((((first))))`,
+		expected: `  (
+    (
+      (
+        (
+          first
+        )
+      )
+    )
+  )
+`,
+	},
+	{
+		expr: `((((first{foo="bar",a="b", c="d"} + second{foo="bar", c="d"}))))`,
+		expected: `  (
+    (
+      (
+        (
+          first{
+            foo="bar",
+            a="b",
+            c="d",
+          }
+        +
+          second{
+            foo="bar",
+            c="d",
+          }
+        )
+      )
+    )
+  )
+`,
+	},
+	{
+		expr: `((((first{foo="bar",a="b", c="d"} + ((second{foo="bar", c="d"}))))))`,
+		expected: `  (
+    (
+      (
+        (
+          first{
+            foo="bar",
+            a="b",
+            c="d",
+          }
+        +
+          (
+            (
+              second{
+                foo="bar",
+                c="d",
+              }
+            )
+          )
+        )
+      )
+    )
+  )
+`,
+	},
+	{
+		expr: `((((first{foo="bar",a="b", c="d"} + ((second{foo="bar", c="d"})) + third{foo="bar",c="d"}))))`,
+		expected: `  (
+    (
+      (
+        (
+          first{
+            foo="bar",
+            a="b",
+            c="d",
+          }
+        +
+          (
+            (
+              second{
+                foo="bar",
+                c="d",
+              }
+            )
+          )
+        +
+          third{
+            foo="bar",
+            c="d",
+          }
+        )
+      )
+    )
+  )
+`,
+	},
+	{
+		expr: `
+    # head 1
+    # head 2
+    first # comment 1
+    # comment 2
+    > bool second`,
+		expected: `  # head 1
+  # head 2
+  first  # comment 1
+  # comment 2
+> bool
+  second
+`,
+	},
+	{
+		expr: `# head 1
+    # head 2
+    first{foo="bar", a="b"} # comment 1
+    # comment 2
+    > bool second{foo="bar", c="d"}
+`, expected: `  # head 1
+  # head 2
+  first{
+    foo="bar",
+    a="b",
+  }  # comment 1
+  # comment 2
+> bool
+  second{
+    foo="bar",
+    c="d",
+  }
+`,
+	},
+}
+
+func TestPrettifyItems(t *testing.T) {
+	for _, expr := range exprsItems {
+		p, err := New(PrettifyExpression, expr.expr)
+		testutil.Ok(t, err)
+		// expression, err := p.parseExpr(expr.expr)
+		lexItems := p.lexItems(expr.expr)
+		p.pd.buff = 1
+		output := p.prettifyItems(lexItems, 0, "")
+		fmt.Println(output)
+		// testutil.Ok(t, err)
+		// formatted, err := p.Prettify(expression, reflect.TypeOf(""), 0, "")
+		// testutil.Ok(t, err)
+		testutil.Equals(t, expr.expected, output, "formatting does not match")
 	}
 }
