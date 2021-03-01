@@ -15,6 +15,7 @@ package remote
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strconv"
 	"sync"
@@ -432,7 +433,7 @@ func (t *QueueManager) sendMetadataWithBackoff(ctx context.Context, metadata []p
 	retry := func() {
 		t.metrics.retriedMetadataTotal.Add(float64(len(metadata)))
 	}
-	err = sendWriteRequestWithBackoff(ctx, t.cfg, t.logger, attemptStore, retry)
+	err = sendWriteRequestWithBackoff(ctx, t.cfg, t.logger, metadataCount, attemptStore, retry, math.MinInt64)
 	if err != nil {
 		return err
 	}
@@ -459,7 +460,7 @@ outer:
 		}
 		t.seriesMtx.Unlock()
 		// This will only loop if the queues are being resharded.
-		backoff := t.cfg.MinBackoff
+		backoff := t.cfg.Retry.MinBackoff
 		for {
 			select {
 			case <-t.quit:
@@ -478,8 +479,8 @@ outer:
 			t.metrics.enqueueRetriesTotal.Inc()
 			time.Sleep(time.Duration(backoff))
 			backoff = backoff * 2
-			if backoff > t.cfg.MaxBackoff {
-				backoff = t.cfg.MaxBackoff
+			if backoff > t.cfg.Retry.MaxBackoff {
+				backoff = t.cfg.Retry.MaxBackoff
 			}
 		}
 	}
@@ -908,6 +909,7 @@ func (s *shards) runShard(ctx context.Context, shardID int, queue chan sample) {
 		nPending       = 0
 		pendingSamples = allocateTimeSeries(max)
 		buf            []byte
+		minSampleTs    int64 = math.MaxInt64
 	)
 
 	timer := time.NewTimer(time.Duration(s.qm.cfg.BatchSendDeadline))
@@ -936,11 +938,16 @@ func (s *shards) runShard(ctx context.Context, shardID int, queue chan sample) {
 			if !ok {
 				if nPending > 0 {
 					level.Debug(s.qm.logger).Log("msg", "Flushing samples to remote storage...", "count", nPending)
-					s.sendSamples(ctx, pendingSamples[:nPending], &buf)
+					s.sendSamples(ctx, pendingSamples[:nPending], &buf, minSampleTs)
 					s.qm.metrics.pendingSamples.Sub(float64(nPending))
 					level.Debug(s.qm.logger).Log("msg", "Done flushing.")
 				}
 				return
+			}
+
+			//fmt.Println(minSampleTs, sample.t)
+			if minSampleTs > sample.t {
+				minSampleTs = sample.t
 			}
 
 			// Number of pending samples is limited by the fact that sendSamples (via sendSamplesWithBackoff)
@@ -952,8 +959,9 @@ func (s *shards) runShard(ctx context.Context, shardID int, queue chan sample) {
 			nPending++
 
 			if nPending >= max {
-				s.sendSamples(ctx, pendingSamples, &buf)
+				s.sendSamples(ctx, pendingSamples, &buf, minSampleTs)
 				nPending = 0
+				minSampleTs = math.MaxInt64
 				s.qm.metrics.pendingSamples.Sub(float64(max))
 
 				stop()
@@ -963,18 +971,19 @@ func (s *shards) runShard(ctx context.Context, shardID int, queue chan sample) {
 		case <-timer.C:
 			if nPending > 0 {
 				level.Debug(s.qm.logger).Log("msg", "runShard timer ticked, sending samples", "samples", nPending, "shard", shardNum)
-				s.sendSamples(ctx, pendingSamples[:nPending], &buf)
+				s.sendSamples(ctx, pendingSamples[:nPending], &buf, minSampleTs)
 				s.qm.metrics.pendingSamples.Sub(float64(nPending))
 				nPending = 0
+				minSampleTs = math.MaxInt64
 			}
 			timer.Reset(time.Duration(s.qm.cfg.BatchSendDeadline))
 		}
 	}
 }
 
-func (s *shards) sendSamples(ctx context.Context, samples []prompb.TimeSeries, buf *[]byte) {
+func (s *shards) sendSamples(ctx context.Context, samples []prompb.TimeSeries, buf *[]byte, minTs int64) {
 	begin := time.Now()
-	err := s.sendSamplesWithBackoff(ctx, samples, buf)
+	err := s.sendSamplesWithBackoff(ctx, samples, buf, minTs)
 	if err != nil {
 		level.Error(s.qm.logger).Log("msg", "non-recoverable error", "count", len(samples), "err", err)
 		s.qm.metrics.failedSamplesTotal.Add(float64(len(samples)))
@@ -988,7 +997,7 @@ func (s *shards) sendSamples(ctx context.Context, samples []prompb.TimeSeries, b
 }
 
 // sendSamples to the remote storage with backoff for recoverable errors.
-func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.TimeSeries, buf *[]byte) error {
+func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.TimeSeries, buf *[]byte, minTs int64) error {
 	// Build the WriteRequest with no metadata.
 	req, highest, err := buildWriteRequest(samples, nil, *buf)
 	if err != nil {
@@ -1032,7 +1041,7 @@ func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.Ti
 		s.qm.metrics.retriedSamplesTotal.Add(float64(sampleCount))
 	}
 
-	err = sendWriteRequestWithBackoff(ctx, s.qm.cfg, s.qm.logger, attemptStore, onRetry)
+	err = sendWriteRequestWithBackoff(ctx, s.qm.cfg, s.qm.logger, sampleCount, attemptStore, onRetry, minTs)
 	if err != nil {
 		return err
 	}
@@ -1041,8 +1050,8 @@ func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.Ti
 	return nil
 }
 
-func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l log.Logger, attempt func(int) error, onRetry func()) error {
-	backoff := cfg.MinBackoff
+func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l log.Logger, samplesCount int, attempt func(int) error, onRetry func(), minTs int64) error {
+	backoff := cfg.Retry.MinBackoff
 	sleepDuration := model.Duration(0)
 	try := 0
 
@@ -1053,9 +1062,19 @@ func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l 
 		default:
 		}
 
+		if policy := cfg.Retry.Policy; !shouldAttempt(policy, minTs, try) {
+			level.Warn(l).Log("msg", fmt.Sprintf("Retrying policy expired. Dropping %d samples", samplesCount), "min_sample_age", policy.MinSampleAge, "max_retries", policy.MaxRetries)
+			return nil
+		}
+
 		err := attempt(try)
 
 		if err == nil {
+			return nil
+		}
+
+		if dropErr, ok := err.(DropError); ok {
+			level.Warn(l).Log("msg", fmt.Sprintf("Received Unprocessable-entity status code. Dropping %d samples", samplesCount), "Err", dropErr.error)
 			return nil
 		}
 
@@ -1084,13 +1103,30 @@ func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l 
 
 		backoff = sleepDuration * 2
 
-		if backoff > cfg.MaxBackoff {
-			backoff = cfg.MaxBackoff
+		if backoff > cfg.Retry.MaxBackoff {
+			backoff = cfg.Retry.MaxBackoff
 		}
 
 		try++
 		continue
 	}
+}
+
+func shouldAttempt(policy config.RetryPolicy, minTs int64, retries int) bool {
+	if !policy.IsSet() {
+		return true
+	}
+
+	minSampleAge := timeMilliseconds(time.Now().Add(-time.Duration(policy.MinSampleAge)))
+	if (policy.MinSampleAge != 0 && minTs < minSampleAge) ||
+		(policy.MaxRetries != 0 && retries > policy.MaxRetries) {
+		return false
+	}
+	return true
+}
+
+func timeMilliseconds(t time.Time) int64 {
+	return t.UnixNano() / int64(time.Millisecond/time.Nanosecond)
 }
 
 func buildWriteRequest(samples []prompb.TimeSeries, metadata []prompb.MetricMetadata, buf []byte) ([]byte, int64, error) {
