@@ -34,6 +34,7 @@ import (
 	"github.com/prometheus/prometheus/config"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/relabel"
+	"github.com/prometheus/prometheus/pkg/timestamp"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/prometheus/prometheus/scrape"
 	"github.com/prometheus/prometheus/tsdb/record"
@@ -433,7 +434,9 @@ func (t *QueueManager) sendMetadataWithBackoff(ctx context.Context, metadata []p
 	retry := func() {
 		t.metrics.retriedMetadataTotal.Add(float64(len(metadata)))
 	}
-	err = sendWriteRequestWithBackoff(ctx, t.cfg, t.logger, metadataCount, attemptStore, retry, math.MinInt64)
+	// Write requests can bear either samples or metadata. Sending -1 as samplesCount indicates that the write request
+	// has no samples, which means it is a metadata request.
+	err = sendWriteRequestWithBackoff(ctx, t.cfg, t.logger, -1, attemptStore, retry, math.MinInt64)
 	if err != nil {
 		return err
 	}
@@ -945,7 +948,6 @@ func (s *shards) runShard(ctx context.Context, shardID int, queue chan sample) {
 				return
 			}
 
-			//fmt.Println(minSampleTs, sample.t)
 			if minSampleTs > sample.t {
 				minSampleTs = sample.t
 			}
@@ -1062,19 +1064,13 @@ func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l 
 		default:
 		}
 
-		if policy := cfg.Retry.Policy; !shouldAttempt(policy, minTs, try) {
+		if policy := cfg.Retry.Policy; samplesCount != -1 && !shouldAttempt(policy, minTs, try) { // We do not want to stop retry for metadata requests. Hence, retry policies does not apply to them.
 			level.Warn(l).Log("msg", fmt.Sprintf("Retrying policy expired. Dropping %d samples", samplesCount), "min_sample_age", policy.MinSampleAge, "max_retries", policy.MaxRetries)
 			return nil
 		}
 
 		err := attempt(try)
-
 		if err == nil {
-			return nil
-		}
-
-		if dropErr, ok := err.(DropError); ok {
-			level.Warn(l).Log("msg", fmt.Sprintf("Received Unprocessable-entity status code. Dropping %d samples", samplesCount), "Err", dropErr.error)
 			return nil
 		}
 
@@ -1112,21 +1108,18 @@ func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l 
 	}
 }
 
-func shouldAttempt(policy config.RetryPolicy, minTs int64, retries int) bool {
-	if !policy.IsSet() {
+func shouldAttempt(policy *config.RetryPolicy, minTs int64, retries int) bool {
+	if policy == nil {
+		// Policy is not set, hence we follow the default behaviour of retry with backoff.
 		return true
 	}
 
-	minSampleAge := timeMilliseconds(time.Now().Add(-time.Duration(policy.MinSampleAge)))
-	if (policy.MinSampleAge != 0 && minTs < minSampleAge) ||
+	minSampleAgeAllowed := timestamp.FromTime(time.Now().Add(-time.Duration(policy.MinSampleAge)))
+	if (policy.MinSampleAge != 0 && minTs < minSampleAgeAllowed) ||
 		(policy.MaxRetries != 0 && retries > policy.MaxRetries) {
 		return false
 	}
 	return true
-}
-
-func timeMilliseconds(t time.Time) int64 {
-	return t.UnixNano() / int64(time.Millisecond/time.Nanosecond)
 }
 
 func buildWriteRequest(samples []prompb.TimeSeries, metadata []prompb.MetricMetadata, buf []byte) ([]byte, int64, error) {
