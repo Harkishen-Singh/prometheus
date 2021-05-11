@@ -850,8 +850,8 @@ func TestRemoteWriteRetryOnRateLimit(t *testing.T) {
 	got := &Config{}
 	require.NoError(t, yaml.UnmarshalStrict(out, got))
 
-	require.True(t, got.RemoteWriteConfigs[0].QueueConfig.Retry.OnRateLimit)
-	require.False(t, got.RemoteWriteConfigs[1].QueueConfig.Retry.OnRateLimit)
+	require.True(t, got.RemoteWriteConfigs[0].QueueConfig.RetryOnRateLimit)
+	require.False(t, got.RemoteWriteConfigs[1].QueueConfig.RetryOnRateLimit)
 }
 
 func TestRetryPolicy(t *testing.T) {
@@ -859,10 +859,10 @@ func TestRetryPolicy(t *testing.T) {
 	require.NoError(t, err)
 
 	// Test if first remote-write has policy set.
-	require.Equal(t, want.RemoteWriteConfigs[0].QueueConfig.Retry.Policy, &RetryPolicy{MinSampleAge: model.Duration(time.Minute * 5), MaxRetries: 20})
+	require.Equal(t, want.RemoteWriteConfigs[0].QueueConfig.RetryPolicy, &RetryPolicy{MinSampleAge: model.Duration(time.Minute * 5), MaxRetries: 20})
 
 	// Test if second remote-write as policy unset.
-	if want.RemoteWriteConfigs[1].QueueConfig.Retry.Policy != nil {
+	if want.RemoteWriteConfigs[1].QueueConfig.RetryPolicy != nil {
 		require.Fail(t, "second remote-write policy is set")
 	}
 }

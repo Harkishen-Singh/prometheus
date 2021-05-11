@@ -463,7 +463,7 @@ outer:
 		}
 		t.seriesMtx.Unlock()
 		// This will only loop if the queues are being resharded.
-		backoff := t.cfg.Retry.MinBackoff
+		backoff := t.cfg.MinBackoff
 		for {
 			select {
 			case <-t.quit:
@@ -482,8 +482,8 @@ outer:
 			t.metrics.enqueueRetriesTotal.Inc()
 			time.Sleep(time.Duration(backoff))
 			backoff = backoff * 2
-			if backoff > t.cfg.Retry.MaxBackoff {
-				backoff = t.cfg.Retry.MaxBackoff
+			if backoff > t.cfg.MaxBackoff {
+				backoff = t.cfg.MaxBackoff
 			}
 		}
 	}
@@ -1053,7 +1053,7 @@ func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.Ti
 }
 
 func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l log.Logger, samplesCount int, attempt func(int) error, onRetry func(), minTs int64) error {
-	backoff := cfg.Retry.MinBackoff
+	backoff := cfg.MinBackoff
 	sleepDuration := model.Duration(0)
 	try := 0
 
@@ -1064,7 +1064,7 @@ func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l 
 		default:
 		}
 
-		if policy := cfg.Retry.Policy; samplesCount != -1 && !shouldAttempt(policy, minTs, try) { // We do not want to stop retry for metadata requests. Hence, retry policies does not apply to them.
+		if policy := cfg.RetryPolicy; samplesCount != -1 && !shouldAttempt(policy, minTs, try) { // We do not want to stop retry for metadata requests. Hence, retry policies does not apply to them.
 			level.Warn(l).Log("msg", fmt.Sprintf("Retrying policy expired. Dropping %d samples", samplesCount), "min_sample_age", policy.MinSampleAge, "max_retries", policy.MaxRetries)
 			return nil
 		}
@@ -1099,8 +1099,8 @@ func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l 
 
 		backoff = sleepDuration * 2
 
-		if backoff > cfg.Retry.MaxBackoff {
-			backoff = cfg.Retry.MaxBackoff
+		if backoff > cfg.MaxBackoff {
+			backoff = cfg.MaxBackoff
 		}
 
 		try++

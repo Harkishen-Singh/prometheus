@@ -126,7 +126,7 @@ func TestSampleDeliveryWithPolicy(t *testing.T) {
 	queueConfig.MaxShards = 1
 	queueConfig.Capacity = len(samples)
 	queueConfig.MaxSamplesPerSend = 500
-	queueConfig.Retry.Policy = &config.RetryPolicy{MinSampleAge: model.Duration(offset - time.Minute*10)}
+	queueConfig.RetryPolicy = &config.RetryPolicy{MinSampleAge: model.Duration(offset - time.Minute*10)}
 
 	dir, err := ioutil.TempDir("", "TestSampleDeliver")
 	require.NoError(t, err)
