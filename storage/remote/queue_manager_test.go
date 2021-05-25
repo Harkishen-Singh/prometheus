@@ -60,7 +60,6 @@ func newHighestTimestampMetric() *maxTimestamp {
 }
 
 func TestSampleDelivery(t *testing.T) {
-
 	testcases := []struct {
 		name      string
 		samples   bool
@@ -153,22 +152,17 @@ func TestSampleDelivery(t *testing.T) {
 }
 
 func TestSampleDeliveryWithPolicy(t *testing.T) {
-	n := config.DefaultQueueConfig.MaxSamplesPerSend * 2
-	offset := time.Minute * 30
-	from := n / 2
-	samples, expectedSamples, series := createTimeseriesWithOffset(n, n, offset, from)
+	testcases := []struct {
+		name      string
+		samples   bool
+		exemplars bool
+	}{
+		{samples: true, exemplars: false, name: "samples only"},
+		{samples: true, exemplars: true, name: "both samples and exemplars"},
+		{samples: false, exemplars: true, name: "exemplars only"},
+	}
 
-	c := NewTestWriteClient()
-	c.expectSamples(expectedSamples, series)
-
-	queueConfig := config.DefaultQueueConfig
-	queueConfig.BatchSendDeadline = model.Duration(100 * time.Millisecond)
-	queueConfig.MaxShards = 1
-	queueConfig.Capacity = len(samples)
-	queueConfig.MaxSamplesPerSend = 500
-	queueConfig.RetryPolicy = &config.RetryPolicy{MinSampleAge: model.Duration(offset - time.Minute*10)}
-
-	dir, err := ioutil.TempDir("", "TestSampleDeliver")
+	dir, err := ioutil.TempDir("", "TestSampleDeliveryWithPolicy")
 	require.NoError(t, err)
 	defer func() {
 		require.NoError(t, os.RemoveAll(dir))
@@ -177,13 +171,11 @@ func TestSampleDeliveryWithPolicy(t *testing.T) {
 	s := NewStorage(nil, nil, nil, dir, defaultFlushDeadline, nil)
 	defer s.Close()
 
+	queueConfig := config.DefaultQueueConfig
+	queueConfig.BatchSendDeadline = model.Duration(100 * time.Millisecond)
+	queueConfig.MaxShards = 1
+
 	writeConfig := config.DefaultRemoteWriteConfig
-	conf := &config.Config{
-		GlobalConfig: config.DefaultGlobalConfig,
-		RemoteWriteConfigs: []*config.RemoteWriteConfig{
-			&writeConfig,
-		},
-	}
 	// We need to set URL's so that metric creation doesn't panic.
 	writeConfig.URL = &common_config.URL{
 		URL: &url.URL{
@@ -191,16 +183,59 @@ func TestSampleDeliveryWithPolicy(t *testing.T) {
 		},
 	}
 	writeConfig.QueueConfig = queueConfig
-	require.NoError(t, s.ApplyConfig(conf))
-	hash, err := toHash(writeConfig)
-	require.NoError(t, err)
-	qm := s.rws.queues[hash]
-	qm.SetClient(c)
+	writeConfig.SendExemplars = true
+	conf := &config.Config{
+		GlobalConfig: config.DefaultGlobalConfig,
+		RemoteWriteConfigs: []*config.RemoteWriteConfig{
+			&writeConfig,
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			var (
+				series          []record.RefSeries
+				samples         []record.RefSample
+				expectedSamples []record.RefSample
+				exemplars       []record.RefExemplar
+			)
+			n := config.DefaultQueueConfig.MaxSamplesPerSend * 2
+			offset := time.Minute * 30
+			from := n / 2
 
-	qm.StoreSeries(series, 0)
+			// Generates same series in both cases.
+			if tc.samples {
+				samples, expectedSamples, series = createTimeseriesWithOffset(n, n, offset, from)
+			}
+			if tc.exemplars {
+				exemplars, series = createExemplars(n, n)
+			}
 
-	qm.Append(samples)
-	c.waitForExpectedSamples(t)
+			// Apply new config.
+			writeConfig.QueueConfig = config.DefaultQueueConfig
+			writeConfig.QueueConfig.BatchSendDeadline = model.Duration(100 * time.Millisecond)
+			writeConfig.QueueConfig.MaxShards = 1
+			writeConfig.QueueConfig.Capacity = len(samples)
+			writeConfig.QueueConfig.MaxSamplesPerSend = 500
+			writeConfig.QueueConfig.RetryPolicy = &config.RetryPolicy{MinSampleAge: model.Duration(time.Minute * 10)}
+
+			require.NoError(t, s.ApplyConfig(conf))
+			hash, err := toHash(writeConfig)
+			require.NoError(t, err)
+			qm := s.rws.queues[hash]
+
+			c := NewTestWriteClient()
+			qm.SetClient(c)
+
+			qm.StoreSeries(series, 0)
+
+			// Send data.
+			c.expectSamples(expectedSamples, series)
+			c.expectExemplars(exemplars, series)
+			qm.Append(samples)
+			qm.AppendExemplars(exemplars)
+			c.waitForExpectedData(t)
+		})
+	}
 }
 
 func TestMetadataDelivery(t *testing.T) {
@@ -633,6 +668,10 @@ func createTimeseriesWithOffset(numSamples, numSeries int, offsetAfterMid time.D
 			}
 			samples = append(samples, s)
 		}
+		series = append(series, record.RefSeries{
+			Ref:    uint64(i),
+			Labels: labels.Labels{{Name: "__name__", Value: name}},
+		})
 	}
 	return samples, expectedSamples, series
 }
