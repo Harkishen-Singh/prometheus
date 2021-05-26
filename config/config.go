@@ -719,7 +719,6 @@ type QueueConfig struct {
 	MaxBackoff       model.Duration `yaml:"max_backoff,omitempty"`
 	RetryOnRateLimit bool           `yaml:"retry_on_http_429,omitempty"`
 
-	// Configuration for retrying functionality in remote-write component.
 	RetryPolicy *RetryPolicy `yaml:"retry_policy,omitempty"`
 }
 

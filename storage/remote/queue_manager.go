@@ -486,9 +486,7 @@ func (t *QueueManager) sendMetadataWithBackoff(ctx context.Context, metadata []p
 	retry := func() {
 		t.metrics.retriedMetadataTotal.Add(float64(len(metadata)))
 	}
-	// Write requests can bear either samples or metadata. Sending -1 as samplesCount indicates that the write request
-	// has no samples, which means it is a metadata request.
-	err = sendWriteRequestWithBackoff(ctx, t.cfg, t.logger, attemptStore, retry, -1, true)
+	err = sendWriteRequestWithBackoff(ctx, t.cfg, t.logger, attemptStore, nil, retry, -1, true)
 	if err != nil {
 		return err
 	}
@@ -1031,9 +1029,9 @@ func (s *shards) runShard(ctx context.Context, shardID int, queue chan interface
 		maxExemplars                                 = int(math.Max(1, float64(max/10)))
 		nPending, nPendingSamples, nPendingExemplars = 0, 0, 0
 		sampleBuffer                                 = allocateSampleBuffer(max)
+		minSampleTs                                  = int64(math.MaxInt64)
 
 		buf            []byte
-		minSampleTs    int64 = math.MaxInt64
 		pendingData    []prompb.TimeSeries
 		exemplarBuffer [][]prompb.Exemplar
 	)
@@ -1152,6 +1150,24 @@ func (s *shards) sendSamples(ctx context.Context, samples []prompb.TimeSeries, s
 	s.qm.lastSendTimestamp.Store(time.Now().Unix())
 }
 
+// removeTs removes the timeseries from the slice and returns the slice containing exemplars only.
+func removeTs(ts []prompb.TimeSeries) (s []prompb.TimeSeries) {
+	for i := range ts {
+		if ts[i].Exemplars != nil {
+			s = append(s, prompb.TimeSeries{
+				Labels: ts[i].Labels,
+				// Even though we have samples as nil in those prompb.TimeSeries that contain exemplar,
+				// in future this might not be true. Hence, explicitly setting samples as 'nil' makes
+				// this function compatible to future changes when we send both Samples and Exemplars
+				// in the same prompb.TimeSeries.
+				Samples:   nil,
+				Exemplars: ts[i].Exemplars,
+			})
+		}
+	}
+	return s
+}
+
 // sendSamples to the remote storage with backoff for recoverable errors.
 func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.TimeSeries, sampleCount int, exemplarCount int, buf *[]byte, minTs int64) error {
 	// Build the WriteRequest with no metadata.
@@ -1165,10 +1181,25 @@ func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.Ti
 	reqSize := len(*buf)
 	*buf = req
 
-	// An anonymous function allows us to defer the completion of our per-try spans
-	// without causing a memory leak, and it has the nice effect of not propagating any
-	// parameters for sendSamplesWithBackoff/3.
-	attemptStore := func(try int) error {
+	var (
+		bufWithoutTs      *[]byte
+		containsExemplars bool
+	)
+	if s.qm.cfg.RetryPolicy != nil {
+		exemplars := removeTs(samples)
+		if len(exemplars) > 0 {
+			containsExemplars = true
+			req, _, err := buildWriteRequest(exemplars, nil, *buf)
+			if err != nil {
+				// Failing to build the write request is non-recoverable, since it will
+				// only error if marshaling the proto to bytes fails.
+				return err
+			}
+			bufWithoutTs = &req
+		}
+	}
+
+	sendReq := func(req *[]byte, try int) error {
 		span, ctx := opentracing.StartSpanFromContext(ctx, "Remote Send Batch")
 		defer span.Finish()
 
@@ -1184,7 +1215,7 @@ func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.Ti
 		begin := time.Now()
 		s.qm.metrics.samplesTotal.Add(float64(sampleCount))
 		s.qm.metrics.exemplarsTotal.Add(float64(exemplarCount))
-		err := s.qm.client().Store(ctx, *buf)
+		err := s.qm.client().Store(ctx, *req)
 		s.qm.metrics.sentBatchDuration.Observe(time.Since(begin).Seconds())
 
 		if err != nil {
@@ -1196,12 +1227,30 @@ func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.Ti
 		return nil
 	}
 
+	// An anonymous function allows us to defer the completion of our per-try spans
+	// without causing a memory leak, and it has the nice effect of not propagating any
+	// parameters for sendSamplesWithBackoff/3.
+	attemptStore := func(try int) error {
+		return sendReq(buf, try)
+	}
+
+	onPolicyViolation := func(try int) error {
+		// When samples retry policy is violated, we do not send that samples batch.
+		// However, we should not prevent from sending exemplars since retry policy
+		// does not to apply to exemplars.
+		if containsExemplars {
+			// Send only if exemplars exists, otherwise do not send empty request.
+			return sendReq(bufWithoutTs, try)
+		}
+		return nil
+	}
+
 	onRetry := func() {
 		s.qm.metrics.retriedSamplesTotal.Add(float64(sampleCount))
 		s.qm.metrics.retriedExemplarsTotal.Add(float64(exemplarCount))
 	}
 
-	err = sendWriteRequestWithBackoff(ctx, s.qm.cfg, s.qm.logger, attemptStore, onRetry, minTs, false)
+	err = sendWriteRequestWithBackoff(ctx, s.qm.cfg, s.qm.logger, attemptStore, onPolicyViolation, onRetry, minTs, false)
 	if err != nil {
 		return err
 	}
@@ -1210,9 +1259,10 @@ func (s *shards) sendSamplesWithBackoff(ctx context.Context, samples []prompb.Ti
 	return nil
 }
 
-func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l log.Logger, attempt func(int) error, onRetry func(), minTs int64, isMetadata bool) error {
+func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l log.Logger, attempt, onPolicyViolation func(int) error, onRetry func(), minTs int64, isMetadata bool) error {
 	backoff := cfg.MinBackoff
 	sleepDuration := model.Duration(0)
+	updateAttempt := false
 	try := 0
 
 	for {
@@ -1222,10 +1272,11 @@ func sendWriteRequestWithBackoff(ctx context.Context, cfg config.QueueConfig, l 
 		default:
 		}
 
-		if policy := cfg.RetryPolicy; !isMetadata && !shouldAttempt(policy, minTs, try) {
+		if policy := cfg.RetryPolicy; !isMetadata && !updateAttempt && !shouldAttempt(policy, minTs, try) {
 			// We do not want to stop retry for metadata requests. Hence, retry policies does not apply to them.
-			level.Warn(l).Log("msg", "Retry policy expired. Dropping the samples batch", "retry_policy.min_sample_age", policy.MinSampleAge, "retry_policy.max_retries", policy.MaxRetries)
-			return nil
+			level.Warn(l).Log("msg", "Retry-policy for samples expired. Dropping the samples batch and continuing with exemplars (if any)", "min_sample_age", timestamp.Time(minTs), "num-retries", try)
+			attempt = onPolicyViolation // Update attempt so that we retry only for exemplars if retry-policy fails.
+			updateAttempt = true
 		}
 
 		err := attempt(try)

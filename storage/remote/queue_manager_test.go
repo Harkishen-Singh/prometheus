@@ -204,10 +204,10 @@ func TestSampleDeliveryWithPolicy(t *testing.T) {
 
 			// Generates same series in both cases.
 			if tc.samples {
-				samples, expectedSamples, series = createTimeseriesWithOffset(n, n, offset, from)
+				samples, expectedSamples, series = createTimeseriesWithOffset(n, 3, offset, from)
 			}
 			if tc.exemplars {
-				exemplars, series = createExemplars(n, n)
+				exemplars, series = createExemplars(n, 3)
 			}
 
 			// Apply new config.
@@ -652,7 +652,7 @@ func createTimeseriesWithOffset(numSamples, numSeries int, offsetAfterMid time.D
 	samples = make([]record.RefSample, 0, numSamples)
 	expectedSamples = make([]record.RefSample, 0)
 	series = make([]record.RefSeries, 0, numSeries)
-	t := time.Now().UnixNano() / int64(time.Millisecond/time.Nanosecond)
+	t := timestamp.FromTime(time.Now())
 	for i := 0; i < numSeries; i++ {
 		name := fmt.Sprintf("test_metric_%d", i)
 		for j := 0; j < numSamples; j++ {
